@@ -8,6 +8,7 @@ class SeckillProjectApplicationTests {
 
     @Test
     void contextLoads() {
+        System.out.println("dev分支");
     }
 
 }
