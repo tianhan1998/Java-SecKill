@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.th.seckill.mapper.GoodsMapper">
+    <resultMap id="sec_goods_mapper" type="SeckillGoods">
+        <id column="id" property="id"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="seckill_price" property="seckillPrice"/>
+        <result column="stock_count" property="stockCount"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="version" property="version"/>
+    </resultMap>
+    <resultMap id="goods_mapper" type="Goods">
+        <id column="id" property="id"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_title" property="goodsTitle"/>
+        <result column="goods_img" property="goodsImg"/>
+        <result column="goods_detail" property="goodsDetail"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="goods_stock" property="goodsStock"/>
+    </resultMap>
+    <select id="selectAllGoods" resultType="List">
+        select * from goods
+    </select>
+    <select id="selectAllSecGood" resultMap="sec_goods_mapper">
+        select * from goods_seckill
+    </select>
+    <select id="selectGoodById" resultMap="goods_mapper">
+        select * from goods where id=#{id}
+    </select>
+    <select id="selectSecGoodById" resultMap="sec_goods_mapper">
+        select * from goods_seckill where id=#{id}
+    </select>
+</mapper>

@@ -1,5 +1,9 @@
 package cn.th.seckill.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 public class User {
@@ -8,7 +12,9 @@ public class User {
     private String password;
     private String salt;
     private String head;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     private Date registerDate;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     private Date lastLoginDate;
 
     @Override

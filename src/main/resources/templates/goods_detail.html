@@ -11,6 +11,9 @@
     <!-- jquery-validator -->
     <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
     <script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
+    <!--vue-->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script th:src="@{/js/vue.min.js}"></script>
     <!-- layer -->
     <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
     <!-- md5.js -->
@@ -20,83 +23,74 @@
 </head>
 <body>
 
-<div class="panel panel-default">
-    <div class="panel-heading">秒杀商品详情</div>
+<div id="app" class="panel panel-default">
+
+    <div class="panel-heading"> <a th:href="@{/secGoodList}"><button style="margin-right: 20px" class="btn btn-default btn-success">返回</button></a>秒杀商品详情</div>
     <div class="panel-body">
-        <span th:if="${user eq null}"> 您还没有登录，请登陆后再操作<br/></span>
+<!--        <span th:if="${user eq null}"> 您还没有登录，请登陆后再操作<br/></span>-->
     </div>
-    <table class="table" id="goodslist">
+    <table  class="table" id="goodslist">
         <tr>
             <td>商品名称</td>
-            <td colspan="3" th:text="${goods.goodsName}"></td>
+            <td colspan="3">{{goods.goodsName}}</td>
         </tr>
         <tr>
             <td>商品图片</td>
-            <td colspan="3"><img th:src="@{${goods.goodsImg}}" width="200" height="200"/></td>
+            <td colspan="3"><img :src="contextpath+goods.goodsImg" width="200" height="200"/></td>
         </tr>
         <tr>
             <td>秒杀开始时间</td>
-            <td th:text="${#dates.format(goods.startDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td colspan="3">{{goods.startDate}}</td>
         </tr>
         <tr>
-            <td id="seckillTip">
-                <input type="hidden" id="remainSeconds" th:value="${remainSeconds}"/>
-                <span th:if="${seckillStatus eq 0}">秒杀倒计时：</span>
-                <span th:if="${seckillStatus eq 1}">秒杀进行中</span>
-                <span th:if="${seckillStatus eq 2}">秒杀已结束</span>
-            </td>
-            <td>
-                <span th:if="${seckillStatus eq 0}"><span id="countDown"
-                                                          th:text="${remainSeconds}"></span>秒</span>
-            </td>
+            <td id="seckillTip"><span>秒杀结束时间</span></td>
+            <td><span id="countDown"></span>{{goods.endDate}}</td>
             <td>
                 <form id="seckillForm" method="post" action="/seckill/do_seckill">
                     <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
-                    <input type="hidden" name="goodsId" th:value="${goods.id}"/>
+                    <input type="hidden" name="goodsId" :value="goods.id"/>
                 </form>
             </td>
         </tr>
         <tr>
             <td>商品原价</td>
-            <td colspan="3" th:text="${goods.goodsPrice}"></td>
+            <td colspan="3">{{goods.goodsPrice}}</td>
         </tr>
         <tr>
             <td>秒杀价</td>
-            <td colspan="3" th:text="${goods.seckillPrice}"></td>
+            <td colspan="3">{{goods.seckillPrice}}</td>
         </tr>
         <tr>
             <td>库存数量</td>
-            <td colspan="3" th:text="${goods.stockCount}"></td>
+            <td colspan="3">{{goods.stockCount}}</td>
         </tr>
     </table>
 </div>
 </body>
-<script>
-    $(function () {
-        countDown();
+<script type="text/javascript">
+    new Vue({
+       el:'#app',
+       data:{
+           contextpath:'[[@{/}]]',
+           goods:{}
+       },
+       mounted:function(){
+           var self=this;
+           var id=[[${good_id}]];
+           axios({
+               method:'GET',
+               url:self.contextpath+"secGoods/"+id,
+           }).then(response=>{
+                if(response.data.code==200){
+                    self.goods=response.data.data;
+                    console.log(response.data.data);
+                }else{
+                    console.log(response);
+                }
+           }).catch(response=>{
+               console.log(response);
+           });
+       }
     });
-
-    function countDown() {
-        var remainSeconds = $("#remainSeconds").val();
-        var timeout;
-        if (remainSeconds > 0) {//秒杀还没开始，倒计时
-//            $("#buyButton").attr("disabled", true);
-            timeout = setTimeout(function () {
-                $("#countDown").text(remainSeconds - 1);
-                $("#remainSeconds").val(remainSeconds - 1);
-                countDown();
-            }, 1000);
-        } else if (remainSeconds == 0) {//秒杀进行中
-            $("#buyButton").attr("disabled", false);
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-            $("#seckillTip").html("秒杀进行中");
-        } else {//秒杀已经结束
-//            $("#buyButton").attr("disabled", true);
-            $("#seckillTip").html("秒杀已经结束");
-        }
-    }
-
 </script>
 </html>

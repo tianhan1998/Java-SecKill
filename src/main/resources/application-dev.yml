@@ -1,4 +1,4 @@
-#Êı¾İ¿â
+#æ•°æ®åº“
 spring:
   datasource:
     username: root
@@ -7,16 +7,15 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
-      initial-size: 5 #Á¬½Ó³Ø³õÊ¼»¯´óĞ¡
-      min-idle: 10 #×îĞ¡¿ÕÏĞÁ¬½ÓÊı
-      max-active: 20 #×î´óÁ¬½ÓÊı
-      # ÅäÖÃ¼à¿ØÍ³¼ÆÀ¹½ØµÄ Filter£¬È¥µôºó¼à¿Ø½çÃæ SQL ÎŞ·¨Í³¼Æ£¬wall ÓÃÓÚ·À»ğÇ½
+      initial-size: 5
+      min-idle: 10
+      max-active: 20
       filters: stat,wall,slf4j
 mybatis:
   mapper-locations: classpath:mappers/*.xml
   configuration:
     use-actual-param-name: true
-
+  type-aliases-package: cn.th.seckill.entity
 
 server:
   servlet:

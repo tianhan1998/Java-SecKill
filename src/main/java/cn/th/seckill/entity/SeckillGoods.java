@@ -1,5 +1,9 @@
 package cn.th.seckill.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 
@@ -7,9 +11,12 @@ public class SeckillGoods {
     private Long id;
     private Long goodsId;
     private Integer stockCount;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     private Date startDate;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     private Date endDate;
     private int version;
+    private Double seckillPrice;
 
     @Override
     public String toString() {
@@ -20,7 +27,16 @@ public class SeckillGoods {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", version=" + version +
+                ", seckillPrice=" + seckillPrice +
                 '}';
+    }
+
+    public Double getSeckillPrice() {
+        return seckillPrice;
+    }
+
+    public void setSeckillPrice(Double seckillPrice) {
+        this.seckillPrice = seckillPrice;
     }
 
     public Long getId() {
