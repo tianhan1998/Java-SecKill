@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>秒杀系统注册</title>
+	<link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet">
+
+	<link th:href="@{/assets/css/animate.css}" rel="stylesheet">
+	<link th:href="@{/assets/css/style.css}" rel="stylesheet">
+	<link th:href="@{/assets/css/custom.css}" rel="stylesheet">
+	<link rel="shortcut icon" href="#" />
+
+</head>
+
+<body class="gray-bg">
+
+<div class="middle-box text-center loginscreen   animated fadeInDown">
+
+	<div>
+		<div>
+<!--			<h1 class="logo-name">IN+</h1>-->
+		</div>
+		<h3>注册</h3>
+		<p>创建属于您的账号</p>
+		<div class="tabbable" id="tabs-215554">
+			<div class="tab-content">
+				<div class="tab-pane active" id="panel-967992">
+					<form id="memForm" class="m-t" role="form">
+						<input type="hidden" name="type" value="0">
+						<div class="form-group">
+											<input id="mem-phone" name="phone" type="text" class="form-control" placeholder="电话" required="">
+											<div id="mem-phone-log" class="badge label label-danger" style="display: none">该电话已被注册</div>
+											</div>
+						<div class="form-group">
+										   <input id="mem-nickname" name="nickname" type="text"  class="form-control" placeholder="昵称" required="">
+										   <div id="mem-nickname-log" class="badge badge-primary" style="display: none">昵称</div>
+										   </div>
+						<div class="form-group">
+										   <input id="pwd1" name="password" type="password" class="form-control" placeholder="密码" required="">
+											<div id="pwd1-log" class="badge label label-danger" style="display: none">密码最少3位</div>
+											</div>
+						<div class="form-group">
+										   <input id="pwd2" type="password" class="form-control" placeholder="二次密码" required="">
+										   <div id="pwd-log" class="badge label label-danger" style="display: none">两次密码不一致</div>
+										   </div>
+<!--						<div class="form-group">-->
+<!--										   <input id="code" name="code" type="text" class="form-control" placeholder="验证码" required="">-->
+<!--										   <img src="./api/getVeifyCode" onclick="yzm(this)">-->
+<!--										   </div>-->
+						<button id="memSubmit" type="button" class="btn btn-primary block full-width m-b">注册</button>
+						<p class="text-muted text-center"><small>已经有账号了吗?</small></p>
+						<a class="btn btn-sm btn-white btn-block" href="login">登陆</a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Mainly scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<!-- iCheck -->
+<script th:src="@{/js/icheck.min.js}"></script>
+<!--		引入加密-->
+<script src="https://cdn.bootcss.com/jsencrypt/3.0.0-beta.1/jsencrypt.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+	var publicKey;
+	var encrypt = new JSEncrypt();//RSA加密对象
+	var context="[[@{/}]]";
+
+	// function yzm(img){
+	// 	img.src="./api/getVeifyCode?id="+ new Date().getTime();
+	// }
+
+
+	$(function () {
+		//获取RSA公钥
+		$.ajax({
+			url:context+"api/getPublicKey",
+			type:"get",
+			success:function (result) {
+			    if(result.result.code==200) {
+					console.log("公钥为" + result.result.data);//获取公钥
+					publicKey = result.result.data;
+					encrypt.setPublicKey(publicKey)//设置公钥
+				}else{
+			    	console.log(result.result.msg);
+				}
+			},
+			error:function(result){
+				console.log(result);
+			}
+		});
+	});
+
+
+	$(document).ready(function() {
+
+		var flagMedPwd=0;
+		var flagMemPhone=0;
+		// var flagyzm=0;
+		
+		// //个人验证码校验
+		// $("#code").blur(function () {
+		// 	var reg=/^\d{4}$/;
+		//
+		// 	var code=$("#code").val();
+		//
+		// 	if(reg.test(code)){
+		// 		flagyzm=1;
+		// 	}else{
+		// 		swal("验证码不合法");
+		// 		flagyzm=0;
+		// 	}
+		// });
+		
+		//个人注册电话验证
+		$("#mem-phone").blur(function () {
+			var phone=$("#mem-phone").val();
+			if(phone.length===11){
+			    $.ajax({
+			        url:context+"user/"+phone,
+			        type:"GET",
+			        success:function(Object){
+			            if(Object.result.code==200) {
+							var log = $("#mem-phone-log").show().removeClass().addClass("badge badge-primary");
+							log.empty().append("通过验证,该电话可以注册");
+							flagMemPhone=1;
+						}else{
+							var log=$("#mem-phone-log").show().removeClass().addClass("badge label label-danger");
+							log.empty().append("该电话已被注册");
+							flagMemPhone=0;
+						}
+			        },
+			        error:function(Object){
+			            console.log(Object);
+			        }
+			    });
+			}else if(phone.length!==0){
+				var log=$("#mem-phone-log").show().removeClass().addClass("badge label-danger");
+				log.empty().append("电话号要合法");
+				flagMemPhone=0;
+			}else{
+				$("#mem-phone-log").hide();
+			}
+		});
+		//个人注册
+		$("#memSubmit").click(function () {
+			if(flagMedPwd==1&&flagMemPhone==1){
+
+				var password=$('#pwd1').val();
+				var item=password;
+
+				console.log("加密前"+password);
+				password=encrypt.encrypt(password);
+				$('#pwd1').val(password);
+				console.log("加密后"+password);
+
+				$.ajax({
+					type:"post",
+					url:context+"user/register",
+					data:$("#memForm").serialize(),
+					success:function (result) {
+						console.log(result);
+						if(result.result.code===200){//注册成功需要重新登录
+							swal("注册成功").then(function () {
+								window.location.href="login";
+							});
+						}else {//失败
+							$('#pwd1').val(item);//失败密码替换掉
+							swal(result.result.msg).then(function () {
+								window.location.reload();
+							});
+						}
+					},
+					error:function (result) {
+						$('#pwd1').val(item);//失败密码替换掉
+						console.log(result);
+					}
+				})
+			}else{
+				swal("请完善您的信息");
+				console.log(flagMemPhone+" "+flagMedPwd+"+flagyzm");
+			}
+		});
+
+		//校验两次密码要一样
+		$("#pwd1").blur(function () {
+			var pwd1 = $("#pwd1").val();
+			if (pwd1.length > 3) {
+				$("#pwd1-log").hide();
+			} else if(pwd1.length!==0) {
+				$("#pwd1-log").show().empty().append("密码最少要3位");
+			} else{
+				$("#pwd1-log").hide();
+			}
+		});
+
+		//校验两次密码要一样
+		$("#pwd2").on("input propertychange",function(){
+			var pwd1 = $("#pwd1").val();
+			var pwd2 = $("#pwd2").val();
+			if (pwd1 != pwd2) {
+				$("#pwd-log").show().empty().append("两次密码不一致");
+				flagMedPwd = 0;
+			} else {
+				$("#pwd-log").hide();
+				flagMedPwd = 1;
+			}
+		});
+	});
+</script>
+</body>
+
+</html>

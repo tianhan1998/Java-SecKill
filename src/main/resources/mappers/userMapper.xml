@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.th.seckill.mapper.UserMapper">
+    <resultMap id="user_mapper" type="User">
+        <id column="id" property="id"/>
+        <result column="phone" property="phone"/>
+        <result column="nickname" property="nickname"/>
+        <result column="password" property="password"/>
+        <result column="register_date" property="registerDate"/>
+        <result column="last_login_date" property="lastLoginDate"/>
+    </resultMap>
+
+    <insert id="insertUser">
+        insert into user(phone,nickname,password) values (#{phone},#{nickname},#{password})
+    </insert>
+    <select id="selectUserByPhone" resultMap="user_mapper">
+        select * from user where phone=#{phone}
+    </select>
+
+    <select id="selectUserByPhoneAndPassword" resultMap="user_mapper">
+        select * from user where phone=#{phone} and password=#{password}
+    </select>
+</mapper>

@@ -14,7 +14,7 @@ spring:
 mybatis:
   mapper-locations: classpath:mappers/*.xml
   configuration:
-    use-actual-param-name: true
+    map-underscore-to-camel-case: true
   type-aliases-package: cn.th.seckill.entity
 
 server:

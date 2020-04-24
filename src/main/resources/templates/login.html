@@ -1,101 +1,144 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>登录</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <!-- jquery -->
-    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
-    <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
-    <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
-    <!-- jquery-validator -->
-    <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
-    <script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
-    <!-- layer -->
-    <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
-    <!-- md5.js -->
-    <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
-    <!-- common.js -->
-    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>秒杀系统登录</title>
+
+	<link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet">
+
+	<link th:href="@{/assets/css/animate.css}" rel="stylesheet">
+	<link th:href="@{/assets/css/style.css}" rel="stylesheet">
+	<link rel="shortcut icon" href="#" />
 
 </head>
-<body>
 
-<form name="loginForm" id="loginForm" method="post" style="width:50%; margin:0 auto">
+<body class="gray-bg">
 
-    <h2 style="text-align:center; margin-bottom: 20px">用户登录</h2>
+<div class="middle-box text-center loginscreen animated fadeInDown">
+	<div>
+		<div>
+			<h1 class="logo-name"></h1>
+		</div>
+		<h3>欢迎您来到秒杀系统</h3>
+		<p>登录您的账号</p>
+		<div class="tabbable" id="tabs-215554">
+			<div class="tab-content">
+				<div class="tab-pane active" id="panel-967992">
+						<form id="memForm" class="m-t" role="form">
 
-    <div class="form-group">
-        <div class="row">
-            <label class="form-label col-md-4">请输入手机号码</label>
-            <div class="col-md-5">
-                <input id="mobile" name="mobile" class="form-control" type="text" placeholder="手机号码" required="true"
-                       minlength="11" maxlength="11"/>
-            </div>
-            <div class="col-md-1">
-            </div>
-        </div>
-    </div>
+							<div id="mem_log" class="alert alert-danger alert-dismissable" hidden="true">
+								<button  aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+								账号或者密码错误 <a class="alert-link" href="#"></a>
+							</div>
+							<input name="type" type="hidden" value="0">
+							<div class="form-group">
+								<input id="mem_phone" name="phone" type="text" class="form-control" placeholder="电话" required="">
+								<div id="mem-phone-log" class="badge label label-danger" style="display: none">请输入正确的手机号格式</div>
+							</div>
+							<div class="form-group">
+								<input id="mem_pwd" name="password" type="password" class="form-control" placeholder="密码" required="">
+							</div>
+							<button id="mem_submit" type="button" class="btn btn-primary block full-width m-b">登陆</button>
+<!--							<a href="retrievePassword"><small>忘记密码?</small></a>-->
+					<p class="text-muted text-center"><small>没有账号吗？</small></p>
+					<a class="btn btn-sm btn-white btn-block" href="register">创建账号</a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
-    <div class="form-group">
-        <div class="row">
-            <label class="form-label col-md-4">请输入密码</label>
-            <div class="col-md-5">
-                <input id="password" name="password" class="form-control" type="password" placeholder="密码"
-                       required="true" minlength="6" maxlength="16"/>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-5">
-            <button class="btn btn-primary btn-block" type="reset" onclick="reset()">重置</button>
-        </div>
-        <div class="col-md-5">
-            <button class="btn btn-primary btn-block" type="submit" onclick="login()">登录</button>
-        </div>
-    </div>
-
-</form>
-</body>
+<!-- Mainly scripts -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<!--		引入加密-->
+<script src="https://cdn.bootcss.com/jsencrypt/3.0.0-beta.1/jsencrypt.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
-    function login() {
-        $("#loginForm").validate({
-            submitHandler: function (form) {
-                doLogin();
-            }
-        });
-    }
-    function doLogin() {
-//        加载中
-        g_showLoading();
+	var publicKey;
+	var encrypt = new JSEncrypt();//RSA加密对象
+	var context="[[@{/}]]";
 
-        var inputPass = $("#password").val();
-        var salt = g_passsword_salt;
-        var str = "" + salt.charAt(0) + salt.charAt(2) + inputPass + salt.charAt(5) + salt.charAt(4);
-        var password = md5(str);
+	$(function () {
+		//获取RSA公钥
+		$.ajax({
+			url:context+"api/getPublicKey",
+			type:"get",
+			success:function (result) {
+				if(result.result.code===200) {
+					console.log("公钥为" + result.result.data);//获取公钥
+					publicKey = result.result.data;
+					encrypt.setPublicKey(publicKey)//设置公钥
+				}else{
+					console.log(result.result.msg);
+				}
+			},
+			error:function(result){
+				console.log(result);
+			}
+		});
+	});
 
-        $.ajax({
-            url: "/login/do_login",
-            type: "POST",
-            data: {
-                mobile: $("#mobile").val(),
-                password: password
-            },
-            success: function (data) {
-                layer.closeAll();
-                if (data.code == 0) {
-                    layer.msg("成功");
-                    window.location.href = "/goods/to_list";
-                } else {
-                    layer.msg(data.msg);
-                }
-            },
-            error: function () {
-                layer.closeAll();
-            }
-        });
-    }
+
+	$(document).ready(function() {
+		//个人登陆
+		$("#mem_submit").click(function () {
+			var memPhone=$("#mem_phone").val();
+			if(memPhone.length!==11){//电话长度有误
+				$("#mem_log").show().html("电话长度有误");
+			}
+			if($("#mem_pwd").val()===""){
+				$("#mem_log").show().html("密码不能为空");
+			}
+			else{
+				//进行登录尝试
+				var password=$("#mem_pwd").val();
+				var item=password;
+
+				password=encrypt.encrypt(password);
+				$("#mem_pwd").val(password);//替换个人登陆的密码
+
+				$.ajax({
+					type:"post",
+					url:context+"user/login",
+					data:$("#memForm").serialize(),
+					success:function (result) {
+						console.log(result);
+						if(result.result.code===200){//登录成功
+						    swal(result.result.msg[0]).then(function () {
+								window.location.href=context+"secGoodList";
+							});
+						}else{//登录失败
+							$("#mem_log").show();
+							$("#mem_pwd").val(item);//登陆失败替换回密码
+							$("#mem_log").show().empty().append(result.result.msg);
+						}
+					},
+					error:function (result) {
+						console.log(result);
+						$("#mem_pwd").val(item);//登陆失败替换回密码
+					}
+				});
+			}
+		});
+		$("#mem_phone").blur(function () {
+			const phone=$("#mem_phone").val();
+			if(phone.length!==11){
+				$("#mem-phone-log").show();
+			}else{
+				$("#mem-phone-log").hide();
+			}
+			if(phone.length===0){
+				$("#mem-phone-log").hide();
+			}
+		});
+	});
 </script>
+</body>
 </html>

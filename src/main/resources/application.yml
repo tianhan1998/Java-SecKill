@@ -1,3 +1,9 @@
 spring:
   profiles:
     active: dev
+
+rsa:
+  # rsa密钥生成数量
+  count: 50
+  # rsa密钥长度
+  length: 512

@@ -1,5 +1,7 @@
 package cn.th.seckill.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 
@@ -12,6 +14,7 @@ public class OrderInfo {
     private Integer goodsCount;
     private Double goodsPrice;
     private Integer status;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     private Date createDate;
 
     @Override

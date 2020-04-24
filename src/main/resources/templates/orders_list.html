@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>商品列表</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- jquery -->
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
+    <!-- layer -->
+    <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
+    <!--vue-->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script th:src="@{/js/vue.min.js}"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
+    <!-- common.js -->
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            background: url('/img/bg2.jpg') no-repeat;
+            background-size: 100% 100%;
+        }
+
+        #goodslist td {
+            border-top: 1px solid #39503f61;
+        }
+    </style>
+</head>
+<body>
+
+<div id="table" class="panel panel-default" style="height:100%;background-color:rgba(222,222,222,0.8)">
+    <div  class="panel-heading">秒杀商品列表</div>
+    <table class="table" id="goodslist">
+        <tr>
+            <td>订单id</td>
+            <td>商品名</td>
+            <td>购买数量</td>
+            <td>订单价格</td>
+            <td>订单状态</td>
+        </tr>
+        <tr v-for="item in orders" >
+            <td>{{item.id}}</td>
+            <td><a :href="'orderDetail/'+item.id">{{item.goodsName}}</a></td>
+            <td>{{item.goodsCount}}</td>
+            <td>{{item.goodsPrice}}</td>
+            <td v-if="item.status == 0">未支付</td>
+            <td v-if="item.status == 1">待发货</td>
+            <td v-if="item.status == 2">已发货</td>
+            <td v-if="item.status == 3">已收货</td>
+            <td v-if="item.status == 4">已退款</td>
+            <td v-if="item.status == 5">已完成</td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript">
+    new Vue({
+        el:'#table',
+        data:{
+            orders:[]
+        },
+        mounted:function(){
+            var self=this;
+            axios({
+                method: 'get',
+                url: 'secGoods',
+            }).then(response=>{
+                self.goods=response.data.data;
+            }).catch(response=>{
+                alert(response);
+            });
+        }
+    });
+</script>
+</body>
+</html>

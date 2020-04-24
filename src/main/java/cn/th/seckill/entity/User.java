@@ -4,17 +4,21 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 public class User {
     private Long id;
+    @NotBlank
     private String nickname;
+    @Size(min = 11,max = 11,message = "手机号长度不对")
+    private String phone;
+    @Size(min = 3,message = "密码长度不对")
     private String password;
-    private String salt;
-    private String head;
-    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date registerDate;
-    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date lastLoginDate;
 
     @Override
@@ -22,12 +26,19 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", nickname='" + nickname + '\'' +
+                ", phone='" + phone + '\'' +
                 ", password='" + password + '\'' +
-                ", salt='" + salt + '\'' +
-                ", head='" + head + '\'' +
                 ", registerDate=" + registerDate +
                 ", lastLoginDate=" + lastLoginDate +
                 '}';
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Long getId() {
@@ -54,22 +65,6 @@ public class User {
         this.password = password;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public String getHead() {
-        return head;
-    }
-
-    public void setHead(String head) {
-        this.head = head;
-    }
-
     public Date getRegisterDate() {
         return registerDate;
     }
@@ -86,3 +81,4 @@ public class User {
         this.lastLoginDate = lastLoginDate;
     }
 }
+
