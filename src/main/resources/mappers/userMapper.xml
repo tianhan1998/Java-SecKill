@@ -23,4 +23,7 @@
     <select id="selectUserByPhoneAndPassword" resultMap="user_mapper">
         select * from user where phone=#{phone} and password=#{password}
     </select>
+    <select id="selectUserById" resultMap="user_mapper">
+        select * from user where id=#{id}
+    </select>
 </mapper>

@@ -5,53 +5,69 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 封装后端返回至前端对象
+ * @param <T> 要返回的数据
+ */
 public class Result<T> {
     private Integer code;
-    private List msg=new ArrayList<>();
-    private T data;
+    private List msg;
+    private T data=null;
 
-    public Result() {
+    public Result(Integer code,String msg) {
+        this.msg= Collections.singletonList(msg);
+        this.code=code;
     }
-
-    public Result(T data) {
+    public Result(Integer code,String msg,T data){
+        this.msg= Collections.singletonList(msg);
+        this.code=code;
         this.data=data;
     }
-
-    public Result<T> successResult(String msg){
-        this.msg.add(msg);
-        this.code=200;
-        return this;
-    }
-
-    public Result<T> failResult(String msg){
-        this.msg.add(msg);
-        this.code=404;
-        return this;
-    }
-
-    public Result<T> exceptionResult(String msg){
-        this.msg.add(msg);
-        this.code=500;
-        return this;
-    }
-
-    public Result<T> exceptionResult(Collection msg){
+    public Result(Integer code,Collection msg) {
         this.msg= (List) msg;
-        this.code=500;
-        return this;
+        this.code=code;
     }
-    public Result<T> successResult(Collection msg){
+    public Result(Integer code,Collection msg,T data){
         this.msg= (List) msg;
-        this.code=200;
-        return this;
+        this.code=code;
+        this.data=data;
     }
-
-    public Result<T> failResult(Collection msg){
-        this.msg= (List) msg;
-        this.code=404;
-        return this;
+    public static Result<Object> successResult(String msg,Object a){
+        return new Result<>(200,msg,a);
     }
-
+    public static Result<Object> successResult(String msg){
+        return new Result<>(200,msg);
+    }
+    public static Result<Object> successResult(Collection msg,Object a){
+        return new Result<>(200,msg,a);
+    }
+    public static Result<Object> successResult(Collection msg){
+        return new Result<>(200,msg);
+    }
+    public static Result<Object> failResult(String msg,Object a){
+        return new Result<>(404,msg,a);
+    }
+    public static Result<Object> failResult(String msg){
+        return new Result<>(404,msg);
+    }
+    public static Result<Object> failResult(Collection msg,Object a){
+        return new Result<>(404,msg,a);
+    }
+    public static Result<Object> failResult(Collection msg){
+        return new Result<>(404,msg);
+    }
+    public static Result<Object> exceptionResult(String msg,Object a){
+        return new Result<>(500,msg,a);
+    }
+    public static Result<Object> exceptionResult(String msg){
+        return new Result<>(500,msg);
+    }
+    public static Result<Object> exceptionResult(Collection msg,Object a){
+        return new Result<>(500,msg,a);
+    }
+    public static Result<Object> exceptionResult(Collection msg){
+        return new Result<>(500,msg);
+    }
     @Override
     public String toString() {
         return "Result{" +

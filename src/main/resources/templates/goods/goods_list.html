@@ -3,10 +3,14 @@
 <head>
     <title>商品列表</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
     <!-- jquery -->
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <link  th:href="@{/assets/css/style.css}" rel="stylesheet">
+    <link  th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet">
+    <link  th:href="@{/assets/css/animate.css}" rel="stylesheet">
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <!-- jquery-validator -->
     <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
@@ -14,7 +18,7 @@
     <!-- layer -->
     <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
     <!--vue-->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
     <script th:src="@{/js/vue.min.js}"></script>
     <!-- md5.js -->
     <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
@@ -27,7 +31,7 @@
         }
 
         body {
-            background: url('/img/bg2.jpg') no-repeat;
+            background:  no-repeat;
             background-size: 100% 100%;
         }
 
@@ -36,10 +40,37 @@
         }
     </style>
 </head>
-<body>
-
+<body class="top-navigation">
 <div id="table" class="panel panel-default" style="height:100%;background-color:rgba(222,222,222,0.8)">
-    <div  class="panel-heading">秒杀商品列表</div>
+    <div id="nav" class="row border-bottom white-bg">
+        <nav class="navbar navbar-static-top" role="navigation">
+            <div class="navbar-header">
+                <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse"
+                        class="navbar-toggle collapsed" type="button">
+                    <i class="fa fa-reorder"></i>
+                </button>
+                <a href="#" class="navbar-brand">秒杀系统</a>
+            </div>
+            <div class="navbar-collapse collapse" id="navbar">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a aria-expanded="false" role="button" th:href="@{/orders}"> 我的订单</a>
+                    </li>
+
+                    <li class="dropdown">
+                        <a aria-expanded="false" role="button" th:href="@{/secGoodList}"> 所有秒杀商品</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li>
+                        <a th:href="@{/login}">
+                            <i class="fa fa-sign-out"></i> 退出登录
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
     <table class="table" id="goodslist">
         <tr>
             <td>商品名称</td>
@@ -57,6 +88,8 @@
         </tr>
     </table>
 </div>
+
+<script th:src="@{/js/sweetalert.min.js}"></script>
 <script type="text/javascript">
     new Vue({
         el:'#table',
@@ -69,7 +102,7 @@
                 method: 'get',
                 url: 'secGoods',
             }).then(response=>{
-                self.goods=response.data.data;
+                self.goods=response.data.result.data;
             }).catch(response=>{
                 alert(response);
             });

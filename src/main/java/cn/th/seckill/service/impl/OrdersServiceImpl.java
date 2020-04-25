@@ -20,6 +20,11 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    public OrderInfo selectOrderById(Long id) {
+        return ordersMapper.selectOrderById(id);
+    }
+
+    @Override
     public List<OrderInfo> selectAllOrdersByUserId(Long id) {
         return ordersMapper.selectAllOrdersByUserId(id);
     }

@@ -29,16 +29,16 @@ public class UserController {
                 log_user=service.selectUserByPhoneAndPassword(user);
                 if(log_user!=null){
                     session.setAttribute("login_user",log_user);
-                    json.put("result",new Result<>().successResult("登陆成功"));
+                    json.put("result",Result.successResult("登陆成功"));
                 }else{
-                    json.put("result",new Result<>().failResult("用户名或密码错误"));
+                    json.put("result",Result.failResult("用户名或密码错误"));
                 }
             }else{
-                json.put("result",new Result<>().failResult("用户名和密码不能为空"));
+                json.put("result",Result.failResult("用户名和密码不能为空"));
             }
         }catch(Exception e){
             e.printStackTrace();
-            json.put("result",new Result<>().exceptionResult(e.getMessage()));
+            json.put("result",Result.exceptionResult(e.getMessage()));
         }
             return json;
     }
@@ -48,31 +48,31 @@ public class UserController {
         JSONObject json=new JSONObject();
         try{
             if(result.hasErrors()){
-                json.put("result",new Result<>().failResult(result.getAllErrors()));
+                json.put("result",Result.failResult(result.getAllErrors()));
                 System.out.println(result.getAllErrors());
             }else {
                 User temp = service.selectUserByPhone(user.getPhone());
                 if (temp != null) {
-                    json.put("result", new Result<>().failResult("此电话已被占用"));
+                    json.put("result", Result.failResult("此电话已被占用"));
                 } else {
                     String privateKey = (String) session.getAttribute("privateKey");
                     if ("".equals(privateKey) || privateKey == null) {
-                        json.put("result", new Result<>().failResult("你还没有获取公钥，请刷新页面"));
+                        json.put("result", Result.failResult("你还没有获取公钥，请刷新页面"));
                     } else {
                         String de_pass = RSAUtils.decrypt(user.getPassword(), privateKey);
                         System.out.println("解密---私钥" + privateKey + "解密后" + de_pass);
                         user.setPassword(de_pass);
                         if (service.insertUser(user) > 0) {
-                            json.put("result", new Result<>().successResult("成功注册"));
+                            json.put("result", Result.successResult("成功注册"));
                         } else {
-                            json.put("result", new Result<>().failResult("数据库操作失败"));
+                            json.put("result", Result.failResult("数据库操作失败"));
                         }
                     }
                 }
             }
         }catch(Exception e){
             e.printStackTrace();
-            json.put("result",new Result<>().exceptionResult(e.getMessage()));
+            json.put("result",Result.exceptionResult(e.getMessage()));
         }
         return json;
 
@@ -85,13 +85,13 @@ public class UserController {
         try{
             user=service.selectUserByPhone(phone);
             if(user!=null) {
-               json.put("result",new Result<>().failResult("此电话已被占用"));
+               json.put("result",Result.failResult("此电话已被占用"));
             }else{
-                json.put("result",new Result<>().successResult("此电话可以注册"));
+                json.put("result",Result.successResult("此电话可以注册"));
             }
         }catch(Exception e){
             e.printStackTrace();
-            json.put("result",new Result<>().exceptionResult(e.getMessage()));
+            json.put("result",Result.exceptionResult(e.getMessage()));
         }
             return json;
     }

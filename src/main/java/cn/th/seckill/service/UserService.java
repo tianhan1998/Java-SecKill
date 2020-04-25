@@ -6,4 +6,5 @@ public interface UserService {
     int insertUser(User user);
     User selectUserByPhone(String phone);
     User selectUserByPhoneAndPassword(User user);
+    User selectUserById(Long id);
 }

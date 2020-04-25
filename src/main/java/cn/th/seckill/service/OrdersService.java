@@ -9,4 +9,5 @@ import java.util.List;
 public interface OrdersService {
     List<OrderInfo> selectAllOrders();
     List<OrderInfo> selectAllOrdersByUserId(Long id);
+    OrderInfo selectOrderById(Long id);
 }

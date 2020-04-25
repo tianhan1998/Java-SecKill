@@ -6,13 +6,16 @@
     <!-- jquery -->
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <link  th:href="@{/assets/css/style.css}" rel="stylesheet">
+    <link  th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet">
+    <link  th:href="@{/assets/css/animate.css}" rel="stylesheet">
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <!-- jquery-validator -->
     <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
     <script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
     <!--vue-->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
     <script th:src="@{/js/vue.min.js}"></script>
     <!-- layer -->
     <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
@@ -21,14 +24,11 @@
     <!-- common.js -->
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
 </head>
-<body>
+<body class="top-navigation" style="background: no-repeat">
+    <div id="app" class="panel panel-default">
 
-<div id="app" class="panel panel-default">
+    <div th:replace="/goods/goods_list::#nav"></div>
 
-    <div class="panel-heading"> <a th:href="@{/secGoodList}"><button style="margin-right: 20px" class="btn btn-default btn-success">返回</button></a>秒杀商品详情</div>
-    <div class="panel-body">
-<!--        <span th:if="${user eq null}"> 您还没有登录，请登陆后再操作<br/></span>-->
-    </div>
     <table  class="table" id="goodslist">
         <tr>
             <td>商品名称</td>
@@ -81,9 +81,9 @@
                method:'GET',
                url:self.contextpath+"secGoods/"+id,
            }).then(response=>{
-                if(response.data.code==200){
-                    self.goods=response.data.data;
-                    console.log(response.data.data);
+                if(response.data.result.code===200){
+                    self.goods=response.data.result.data;
+                    console.log(response.data.result);
                 }else{
                     console.log(response);
                 }

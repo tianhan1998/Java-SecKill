@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>订单详情</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- jquery -->
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <link  th:href="@{/assets/css/style.css}" rel="stylesheet">
+    <link  th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet">
+    <link  th:href="@{/assets/css/animate.css}" rel="stylesheet">
+    <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
+    <!--vue-->
+    <script th:src="@{/js/axios.min.js}"></script>
+    <script th:src="@{/js/vue.min.js}"></script>
+    <!-- layer -->
+    <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
+    <!-- common.js -->
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+</head>
+<body class="top-navigation"  style="background: no-repeat">
+<div id="app" class="panel panel-default">
+    <div th:replace="/goods/goods_list::#nav"></div>
+  <table class="table" id="goodslist">
+        <tr>
+        <td>商品名称</td>
+        <td colspan="3">{{order.goodsName}}</td>
+     </tr>
+     <tr>
+        <td>商品图片</td>
+        <td colspan="2"><img :src="contextpath+order.goodsImg" width="200" height="200" /></td>
+     </tr>
+      <tr>
+        <td>订单价格</td>
+        <td colspan="2">{{order.goodsPrice}}</td>
+     </tr>
+     <tr>
+        <td>下单时间</td>
+        <td colspan="2">{{order.createDate}}</td>
+     </tr>
+     <tr>
+     	<td>订单状态</td>
+        <td>
+             <span v-if="order.status == 0">未支付</span>
+             <span v-if="order.status == 1">待发货</span>
+             <span v-if="order.status == 2">已发货</span>
+             <span v-if="order.status == 3">已收货</span>
+             <span v-if="order.status == 4">已退款</span>
+             <span v-if="order.status == 5">已完成</span>
+        </td>
+        <td>
+        	<button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
+        </td>
+     </tr>
+      <tr>
+     		<td>收货人</td>
+        	<td colspan="2">{{order.nickName}}</td>
+     </tr>
+     <tr>
+     		<td>收货地址</td>
+        	<td colspan="2">{{order.address}}</td>
+     </tr>
+  </table>
+</div>
+<script type="text/javascript">
+    new Vue({
+        el:'#app',
+        data:{
+            contextpath:'[[@{/}]]',
+            order:{}
+        },
+        mounted:function(){
+            var self=this;
+            var id=[[${order_id}]];
+            axios({
+                method:'GET',
+                url:self.contextpath+"order/"+id,
+            }).then(response=>{
+                if(response.data.result.code===200){
+                    self.order=response.data.result.data;
+                    console.log(response.data.result);
+                }else{
+                    console.log(response);
+                }
+            }).catch(response=>{
+                console.log(response);
+            });
+        }
+    });
+</script>
+</body>
+</html>

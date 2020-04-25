@@ -1,6 +1,7 @@
 package cn.th.seckill.controller;
 
 import cn.th.seckill.entity.Goods;
+import cn.th.seckill.entity.Result;
 import cn.th.seckill.entity.SeckillGoods;
 import cn.th.seckill.entity.vo.GoodsVo;
 import cn.th.seckill.service.GoodsService;
@@ -34,19 +35,13 @@ public class GoodsController {
                     voGoods.add(new GoodsVo(temp_good,sgood));
                 }
                 System.out.println(voGoods);
-                json.put("data", voGoods);
-                json.put("code",200);
-                json.put("msg","查询成功");
+                json.put("result",Result.successResult("查找成功",voGoods));
             } else {
-                json.put("data", null);
-                json.put("code",404);
-                json.put("msg","未找到秒杀商品");
+                json.put("result",Result.failResult("未找到相关商品"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("code",500);
-            json.put("msg",e.getMessage());
-            json.put("data",null);
+            json.put("result",Result.exceptionResult(e.getMessage()));
         }
         return json;
     }
@@ -62,19 +57,13 @@ public class GoodsController {
             if(sec_good!=null){
                 good=service.selectGoodById(sec_good.getGoodsId());
                 goodsVo=new GoodsVo(good,sec_good);
-                json.put("data",goodsVo);
-                json.put("code",200);
-                json.put("msg","查找成功");
+                json.put("result",Result.successResult("查找成功",goodsVo));
             }else{
-                json.put("data",null);
-                json.put("code",404);
-                json.put("msg","未找到数据");
+                json.put("result",Result.failResult("未找到相关商品"));
             }
         }catch(Exception e){
             e.printStackTrace();
-            json.put("code",500);
-            json.put("msg",e.getMessage());
-            json.put("data",null);
+            json.put("result",Result.exceptionResult(e.getMessage()));
         }
             return json;
     }

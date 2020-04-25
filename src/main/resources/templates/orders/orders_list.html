@@ -6,7 +6,10 @@
     <!-- jquery -->
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
     <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <link  th:href="@{/assets/css/style.css}" rel="stylesheet">
+    <link  th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet">
+    <link  th:href="@{/assets/css/animate.css}" rel="stylesheet">
     <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
     <!-- jquery-validator -->
     <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
@@ -14,13 +17,23 @@
     <!-- layer -->
     <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
     <!--vue-->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
     <script th:src="@{/js/vue.min.js}"></script>
     <!-- md5.js -->
     <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
     <!-- common.js -->
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
     <style type="text/css">
+        #pay{
+            color: #fff;
+            background-color: #5cb85c;
+            border-color: #4cae4c;
+        }
+        #pay:hover{
+            color: #fff;
+            background-color: #449d44;
+            border-color: #398439;
+        }
         html, body {
             height: 100%;
             width: 100%;
@@ -36,21 +49,23 @@
         }
     </style>
 </head>
-<body>
-
+<body class="top-navigation">
 <div id="table" class="panel panel-default" style="height:100%;background-color:rgba(222,222,222,0.8)">
-    <div  class="panel-heading">秒杀商品列表</div>
+    <div th:replace="/goods/goods_list::#nav"></div>
     <table class="table" id="goodslist">
         <tr>
             <td>订单id</td>
             <td>商品名</td>
+            <td>商品图片</td>
             <td>购买数量</td>
             <td>订单价格</td>
             <td>订单状态</td>
+            <td>操作</td>
         </tr>
         <tr v-for="item in orders" >
-            <td>{{item.id}}</td>
-            <td><a :href="'orderDetail/'+item.id">{{item.goodsName}}</a></td>
+            <td>{{item.orderId}}</td>
+            <td><a :href="'orderDetail/'+item.orderId">{{item.goodsName}}</a></td>
+            <td><img :src="context+item.goodsImg" width="100" height="100" /></td>
             <td>{{item.goodsCount}}</td>
             <td>{{item.goodsPrice}}</td>
             <td v-if="item.status == 0">未支付</td>
@@ -59,24 +74,31 @@
             <td v-if="item.status == 3">已收货</td>
             <td v-if="item.status == 4">已退款</td>
             <td v-if="item.status == 5">已完成</td>
+            <td><a :href="contextpath+'pay/'+item.goodsId"><button id="pay" type="button" class="btn btn-success">立即支付</button></a></td>
         </tr>
     </table>
 </div>
 <script type="text/javascript">
+    var context="[[@{/}]]";
     new Vue({
         el:'#table',
         data:{
+            contextpath:'[[@{/}]]',
             orders:[]
         },
         mounted:function(){
             var self=this;
             axios({
                 method: 'get',
-                url: 'secGoods',
+                url: context+'order',
             }).then(response=>{
-                self.goods=response.data.data;
+                if(response.data.result.code===200) {
+                    self.orders = response.data.result.data;
+                }else{
+                    console.log(response.result);
+                }
             }).catch(response=>{
-                alert(response);
+                console.log(response);
             });
         }
     });

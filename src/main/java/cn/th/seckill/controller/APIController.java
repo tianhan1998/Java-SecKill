@@ -23,13 +23,13 @@ public class APIController {
             if(rsa!=null){
                 RSABean rsaBean=rsa.getRandomKey();
                 session.setAttribute("privateKey",rsaBean.getPrivateKey());
-                json.put("result", new Result<>(rsaBean.getPublicKey()).successResult("获取公钥成功"));
+                json.put("result", Result.successResult("获取公钥成功",rsaBean.getPublicKey()));
             }else{
-                json.put("result",new Result<>().failResult("RSA实例出现问题"));
+                json.put("result",Result.failResult("RSA实例出现问题"));
             }
         }catch(Exception e){
             e.printStackTrace();
-            json.put("result",new Result<>().exceptionResult(e.getMessage()));
+            json.put("result",Result.exceptionResult(e.getMessage()));
         }
             return json;
     }

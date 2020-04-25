@@ -1,6 +1,7 @@
 package cn.th.seckill.mapper;
 
 import cn.th.seckill.entity.OrderInfo;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,4 +10,5 @@ import java.util.List;
 public interface OrdersMapper {
     List<OrderInfo> selectAllOrders();
     List<OrderInfo> selectAllOrdersByUserId(Long id);
+    OrderInfo selectOrderById(Long id);
 }
