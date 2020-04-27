@@ -11,7 +11,13 @@
         <result column="password" property="password"/>
         <result column="register_date" property="registerDate"/>
         <result column="last_login_date" property="lastLoginDate"/>
+        <result column="address" property="address"/>
+        <result column="true_name" property="trueName"/>
     </resultMap>
+
+    <update id="updateUserAddressTrueNameById">
+        update user set address=#{address},true_name=#{trueName} where id=#{id}
+    </update>
 
     <insert id="insertUser">
         insert into user(phone,nickname,password) values (#{phone},#{nickname},#{password})

@@ -25,9 +25,13 @@ public class UserServiceImpl implements UserService {
     public User selectUserById(Long id) {
         return userMapper.selectUserById(id);
     }
-
     @Override
     public User selectUserByPhoneAndPassword(User user) {
         return userMapper.selectUserByPhoneAndPassword(user);
+    }
+
+    @Override
+    public int updateUserAddressTrueNameById(User user) {
+        return userMapper.updateUserAddressTrueNameById(user);
     }
 }

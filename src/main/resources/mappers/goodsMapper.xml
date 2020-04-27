@@ -35,4 +35,10 @@
     <select id="selectSecGoodById" resultMap="sec_goods_mapper">
         select * from goods_seckill where id=#{id}
     </select>
+    <update id="decStockCount">
+        update goods_seckill set stock_count=stock_count-1 where stock_count>0 and id=#{id}
+    </update>
+    <update id="incStockCount">
+        update goods_seckill set stock_count=stock_count+1 where stock_count>=0 and id=#{id}
+    </update>
 </mapper>

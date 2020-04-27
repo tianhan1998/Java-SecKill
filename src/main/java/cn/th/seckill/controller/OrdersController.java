@@ -9,9 +9,8 @@ import cn.th.seckill.service.GoodsService;
 import cn.th.seckill.service.OrdersService;
 import cn.th.seckill.service.UserService;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -81,7 +80,7 @@ public class OrdersController {
                             }
                         }});
                 }
-                System.out.println(voLists);
+//                System.out.println(voLists);
                 json.put("result", Result.successResult("查找成功", voLists));
             }else{
                 json.put("result",Result.failResult("查找失败"));
@@ -89,6 +88,72 @@ public class OrdersController {
         } catch (Exception e) {
             e.printStackTrace();
             json.put("result",Result.exceptionResult(e.getMessage()));
+        }
+        return json;
+    }
+    @GetMapping("buyNow")
+    public JSONObject buyNow(HttpSession session,String goodId){
+        JSONObject json=new JSONObject();
+        try{
+            if(!StringUtils.isEmpty(goodId)) {
+                Goods good = goodsService.selectGoodById(Long.parseLong(goodId));
+                if (good != null) {
+                    User user = (User) session.getAttribute("login_user");
+                    OrdersVO ordersVO = new OrdersVO(good);
+                    ordersVO.setTrueName(user.getTrueName());
+                    ordersVO.setAddress(user.getAddress());
+                    ordersVO.setPhone(user.getPhone());
+                    json.put("result", Result.successResult("信息查找成功", ordersVO));
+                } else {
+                    json.put("result", Result.failResult("商品信息查找失败"));
+                }
+            }else{
+                json.put("result",Result.failResult("参数错误"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.put("result", Result.exceptionResult(e.getMessage()));
+        }
+        return json;
+    }
+    @PostMapping("/pay")
+    public JSONObject pay(@RequestBody OrderInfo order,HttpSession session){
+         JSONObject json=new JSONObject();
+         try{
+             if(order!=null){
+                 User user= (User) session.getAttribute("login_user");
+                 order.setUserId(user.getId());
+                if(ordersService.insertOrder(order)){
+                    json.put("result",Result.successResult("下单成功，请尽快支付"));
+                }else{
+                    json.put("result",Result.failResult("下单失败"));
+                }
+             }else{
+                 json.put("result",Result.failResult("参数有误"));
+             }
+         } catch (Exception e) {
+             e.printStackTrace();
+             json.put("result", Result.exceptionResult(e.getMessage()));
+         }
+         return json;
+    }
+    @DeleteMapping("/order/{id}")
+    public JSONObject deleteOrder(@PathVariable String id){
+        JSONObject json=new JSONObject();
+        try{
+            OrderInfo order=ordersService.selectOrderById(Long.parseLong(id));
+            if(order!=null){
+                if(ordersService.deleteOrder(order)){
+                    json.put("result",Result.successResult("删除订单成功"));
+                }else{
+                    json.put("result",Result.failResult("删除订单失败"));
+                }
+            }else{
+                json.put("result",Result.failResult("查找订单信息失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.put("result", Result.exceptionResult(e.getMessage()));
         }
         return json;
     }

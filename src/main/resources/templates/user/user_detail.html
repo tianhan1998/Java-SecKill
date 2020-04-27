@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>商品详情</title>
+    <title>用户详细信息</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <!-- jquery -->
     <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
@@ -23,43 +23,37 @@
     <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
     <!-- common.js -->
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/sweetalert.min.js}"></script>
 </head>
 <body class="top-navigation" style="background: no-repeat">
     <div id="app" class="panel panel-default">
 
     <div th:replace="/goods/goods_list::#nav"></div>
 
-    <table  class="table" id="goodslist">
+    <table class="table" id="userlist">
         <tr>
-            <td>商品名称</td>
-            <td colspan="3">{{goods.goodsName}}</td>
+            <td>昵称</td>
+            <td colspan="3">{{user.nickname}}</td>
         </tr>
         <tr>
-            <td>商品图片</td>
-            <td colspan="3"><img :src="contextpath+goods.goodsImg" width="200" height="200"/></td>
+            <td>用户电话</td>
+            <td colspan="3">{{user.phone}}</td>
         </tr>
         <tr>
-            <td>秒杀开始时间</td>
-            <td colspan="3">{{goods.startDate}}</td>
+            <td>收件人姓名</td>
+            <td colspan="3"><input type="text" id="trueName" :value="user.trueName"></td>
         </tr>
         <tr>
-            <td id="seckillTip"><span>秒杀结束时间</span></td>
-            <td><span id="countDown"></span>{{goods.endDate}}</td>
+            <td>收件人地址</td>
+            <td colspan="3"><input type="text" id="address" :value="user.address"></td>
+        </tr>
+        <tr>
+            <td></td>
             <td>
-                <button class="btn btn-primary btn-block" v-on:click="buy" type="button" id="buyButton">立即秒杀</button>
+            <form id="seckillForm" method="post">
+                <button class="btn btn-primary" v-on:click="submit" type="button" id="buyButton">修改收货信息</button>
+            </form>
             </td>
-        </tr>
-        <tr>
-            <td>商品原价</td>
-            <td colspan="3">{{goods.goodsPrice}}</td>
-        </tr>
-        <tr>
-            <td>秒杀价</td>
-            <td colspan="3">{{goods.seckillPrice}}</td>
-        </tr>
-        <tr>
-            <td>库存数量</td>
-            <td colspan="3">{{goods.stockCount}}</td>
         </tr>
     </table>
 </div>
@@ -69,17 +63,16 @@
        el:'#app',
        data:{
            contextpath:'[[@{/}]]',
-           goods:{}
+           user:{}
        },
        mounted:function(){
-           var self=this;
-           var id=[[${good_id}]];
+           const self = this;
            axios({
                method:'GET',
-               url:self.contextpath+"secGoods/"+id,
+               url:self.contextpath+"user/myAccount",
            }).then(response=>{
                 if(response.data.result.code===200){
-                    self.goods=response.data.result.data;
+                    self.user=response.data.result.data;
                     console.log(response.data.result);
                 }else{
                     console.log(response);
@@ -88,10 +81,31 @@
                console.log(response);
            });
        },
-        methods:{
-           buy:function () {
-               var self=this;
-               window.location.href=self.contextpath+"buy/"+[[${good_id}]];
+        methods: {
+           submit:function () {
+               const self = this;
+               if($("#address").val()!==""&&$("#trueName").val()!=="") {
+                   axios({
+                       method: 'POST',
+                       url: self.contextpath + "user/updateUserAddress",
+                       data: {
+                           "address": $("#address").val(),
+                           "trueName": $("#trueName").val(),
+                       }
+                   }).then(response => {
+                       if (response.data.result.code === 200) {
+                           swal(response.data.result.msg[0]).then(function () {
+                               window.location.reload();
+                           });
+                       } else {
+                           console.log(response.data.result);
+                       }
+                   }).catch(response => {
+                       console.log(response);
+                   });
+               }else{
+                   swal("地址和姓名不能为空");
+               }
            }
         }
     });

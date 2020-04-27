@@ -23,6 +23,7 @@
     <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
     <!-- common.js -->
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/sweetalert.min.js}"></script>
     <style type="text/css">
         #pay{
             color: #fff;
@@ -54,49 +55,66 @@
     <div th:replace="/goods/goods_list::#nav"></div>
     <table class="table" id="goodslist">
         <tr>
-            <td>订单id</td>
             <td>商品名</td>
             <td>商品图片</td>
-            <td>购买数量</td>
-            <td>订单价格</td>
-            <td>订单状态</td>
-            <td>操作</td>
+            <td>购买数量（份）</td>
+            <td>商品价格</td>
+            <td/>
         </tr>
-        <tr v-for="item in orders" >
-            <td>{{item.orderId}}</td>
-            <td><a :href="'orderDetail/'+item.orderId">{{item.goodsName}}</a></td>
-            <td><img :src="context+item.goodsImg" width="100" height="100" /></td>
-            <td>{{item.goodsCount}}</td>
-            <td>{{item.goodsPrice}}</td>
-            <td v-if="item.status == 0">未支付</td>
-            <td v-if="item.status == 1">待发货</td>
-            <td v-if="item.status == 2">已发货</td>
-            <td v-if="item.status == 3">已收货</td>
-            <td v-if="item.status == 4">已退款</td>
-            <td v-if="item.status == 5">已完成</td>
-            <td><a :href="contextpath+'pay/'+item.goodsId"><button id="pay" type="button" class="btn btn-success">立即支付</button></a>
-                <button type="button" @click="deleteOrder(item.orderId)" class="btn btn-danger">删除订单</button>
-            </td>
+        <tr>
+            <td>{{data.goodsName}}</td>
+            <td><img :src="contextpath+data.goodsImg" width="100" height="100" /></td>
+            <td>1</td>
+            <td>{{data.goodsPrice}}</td>
+            <td/>
+        </tr>
+        <tr>
+            <td>收货人</td>
+            <td colspan="2"><input type="text" :value="data.trueName" id="trueName" name="trueName"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>收货地址</td>
+            <td colspan="2"><input type="text" :value="data.address" id="address" name="address"/></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>收货电话</td>
+            <td colspan="2"><input type="text" :value="data.phone" id="phone" name="phone"/></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><button id="pay" v-on:click="pay" type="button" class="btn-block btn btn-success">立即支付</button></td>
+            <td></td>
+            <td></td>
+            <td/>
         </tr>
     </table>
 </div>
-<script th:src="@{/js/sweetalert.min.js}"></script>
 <script type="text/javascript">
     var context="[[@{/}]]";
     new Vue({
         el:'#table',
         data:{
+            goodId:'[[${good_id}]]',
             contextpath:'[[@{/}]]',
-            orders:[]
+            data:{}
         },
         mounted:function(){
             var self=this;
             axios({
                 method: 'get',
-                url: context+'order',
+                url: context+'buyNow',
+                params:{
+                    goodId:self.goodId
+                }
             }).then(response=>{
                 if(response.data.result.code===200) {
-                    self.orders = response.data.result.data;
+                    self.data = response.data.result.data;
                 }else{
                     console.log(response.result);
                 }
@@ -105,32 +123,29 @@
             });
         },
         methods:{
-            deleteOrder:function (id) {
+            pay:function () {
                 var self=this;
-                swal({
-                    title:"确定删除？",
-                    text:"删除之后无法恢复订单",
-                    icon:"warning",
-                    dangerMode:true,
-                    buttons:["取消","删除"],
-                }).then(result=>{
-                    if(result){
-                        axios({
-                            url:self.contextpath+'order/'+id,
-                            method:"DELETE",
-                        }).then(response=>{
-                            if(response.data.result.code===200){
-                                swal(response.data.result.msg[0],{icon:"success"}).then(function () {
-                                    window.location.reload();
-                                });
-                            }else{
-                                swal(response.data.result,{icon:"error"});
-                            }
-                        }).catch(response=>{
-                            console.log(response);
-                        });
+                axios({
+                    url:context+"/pay",
+                    method:'POST',
+                    data:{
+                        'goodsId':self.goodId,
+                        'info':$("#address").val()+' '+$("#trueName").val()+$("#phone").val(),
+                        'goodsName':self.data.goodsName,
+                        'goodsCount':1,
+                        'goodsPrice':self.data.goodsPrice,
                     }
-                })
+                }).then(response=>{
+                    if(response.data.result.code===200){
+                        swal(response.data.result.msg[0],{icon:"success"}).then(function () {
+                            window.location.href=context+"orders";
+                        });
+                    }else{
+                        console.log(response.data.result);
+                    }
+                }).catch(response=>{
+                    console.log(response);
+                });
             }
         }
     });

@@ -10,4 +10,5 @@ public interface UserMapper {
     User selectUserByPhone(String phone);
     User selectUserByPhoneAndPassword(User user);
     User selectUserById(Long id);
+    int updateUserAddressTrueNameById(User user);
 }

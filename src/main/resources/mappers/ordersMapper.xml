@@ -8,7 +8,7 @@
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="goods_id" property="goodsId"/>
-        <result column="address" property="address"/>
+        <result column="info" property="info"/>
         <result column="goods_name" property="goodsName"/>
         <result column="goods_count" property="goodsCount"/>
         <result column="goods_price" property="goodsPrice"/>
@@ -26,4 +26,12 @@
     <select id="selectOrderById" resultMap="orders_mapper">
         select * from order_info where id=#{id}
     </select>
+
+    <insert id="insertOrderInfo">
+        insert into order_info(user_id, goods_id, info, goods_name, goods_count, goods_price, status) values (#{userId},#{goodsId},#{info},#{goodsName},#{goodsCount},#{goodsPrice},0)
+    </insert>
+
+    <delete id="deleteOrderById">
+        delete from order_info where id=#{id}
+    </delete>
 </mapper>

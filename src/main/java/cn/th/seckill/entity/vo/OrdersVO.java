@@ -20,8 +20,50 @@ public class OrdersVO {
     private String address;
     private String nickName;
     private Integer goodsCount;//订单购买量
+    private String trueName;
+    private String phone;
+
+    @Override
+    public String toString() {
+        return "OrdersVO{" +
+                "orderId=" + orderId +
+                ", goodsName='" + goodsName + '\'' +
+                ", goodsImg='" + goodsImg + '\'' +
+                ", goodsId=" + goodsId +
+                ", goodsPrice=" + goodsPrice +
+                ", status=" + status +
+                ", createDate=" + createDate +
+                ", address='" + address + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", goodsCount=" + goodsCount +
+                ", trueName='" + trueName + '\'' +
+                ", phone='" + phone + '\'' +
+                '}';
+    }
+
+    public String getTrueName() {
+        return trueName;
+    }
+
+    public void setTrueName(String trueName) {
+        this.trueName = trueName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public OrdersVO() {
+    }
+    public OrdersVO(User user){
+        this.trueName=user.getTrueName();
+        this.address=user.getAddress();
+        this.phone=user.getPhone();
+        this.nickName = user.getNickname();
     }
     public OrdersVO(Goods good){
         this.goodsId=good.getId();
@@ -37,17 +79,14 @@ public class OrdersVO {
         this.orderId=info.getId();
         this.status = info.getStatus();
         this.createDate = info.getCreateDate();
-        this.address = info.getAddress();
-    }
-    public OrdersVO(User user){
-        this.nickName = user.getNickname();
+        this.address = info.getInfo();
     }
     public OrdersVO(Goods good, OrderInfo info, User user) {
         this.goodsId=good.getId();
         this.nickName = user.getNickname();
         this.status = info.getStatus();
         this.createDate = info.getCreateDate();
-        this.address = info.getAddress();
+        this.address = info.getInfo();
         this.goodsName = good.getGoodsName();
         this.goodsImg = good.getGoodsImg();
         this.goodsPrice = good.getGoodsPrice();
@@ -59,21 +98,6 @@ public class OrdersVO {
 
     public void setGoodsId(Long goodsId) {
         this.goodsId = goodsId;
-    }
-
-    @Override
-    public String toString() {
-        return "OrdersVO{" +
-                "orderId='" + orderId + '\'' +
-                ", goodsName='" + goodsName + '\'' +
-                ", goodsImg='" + goodsImg + '\'' +
-                ", goodsPrice=" + goodsPrice +
-                ", status=" + status +
-                ", createDate=" + createDate +
-                ", address='" + address + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", goodsCount=" + goodsCount +
-                '}';
     }
 
     public Long getOrderId() {

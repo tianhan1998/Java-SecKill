@@ -9,7 +9,7 @@ public class OrderInfo {
     private Long id;
     private Long userId;
     private Long goodsId;
-    private String address;
+    private String info;
     private String goodsName;
     private Integer goodsCount;
     private Double goodsPrice;
@@ -23,7 +23,7 @@ public class OrderInfo {
                 "id=" + id +
                 ", userId=" + userId +
                 ", goodsId=" + goodsId +
-                ", address='" + address + '\'' +
+                ", address='" + info + '\'' +
                 ", goodsName='" + goodsName + '\'' +
                 ", goodsCount=" + goodsCount +
                 ", goodsPrice=" + goodsPrice +
@@ -56,12 +56,12 @@ public class OrderInfo {
         this.goodsId = goodsId;
     }
 
-    public String getAddress() {
-        return address;
+    public String getInfo() {
+        return info;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setInfo(String info) {
+        this.info = info;
     }
 
     public String getGoodsName() {

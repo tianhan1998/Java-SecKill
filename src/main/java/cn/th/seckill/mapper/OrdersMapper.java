@@ -11,4 +11,6 @@ public interface OrdersMapper {
     List<OrderInfo> selectAllOrders();
     List<OrderInfo> selectAllOrdersByUserId(Long id);
     OrderInfo selectOrderById(Long id);
+    int insertOrderInfo(OrderInfo info);
+    int deleteOrderById(Long id);
 }

@@ -20,6 +20,8 @@ public class User {
     private Date registerDate;
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date lastLoginDate;
+    private String trueName;
+    private String address;
 
     @Override
     public String toString() {
@@ -30,7 +32,25 @@ public class User {
                 ", password='" + password + '\'' +
                 ", registerDate=" + registerDate +
                 ", lastLoginDate=" + lastLoginDate +
+                ", trueName='" + trueName + '\'' +
+                ", address='" + address + '\'' +
                 '}';
+    }
+
+    public String getTrueName() {
+        return trueName;
+    }
+
+    public void setTrueName(String trueName) {
+        this.trueName = trueName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getPhone() {
