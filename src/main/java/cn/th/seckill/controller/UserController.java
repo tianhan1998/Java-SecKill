@@ -22,18 +22,19 @@ public class UserController {
     @PostMapping("/login")
     public JSONObject login(User user,HttpSession session) {
         JSONObject json = new JSONObject();
-        User log_user;
+        User logUser;
         try {
             if (!"".equals(user.getPhone()) && !"".equals(user.getPassword())) {
                 String privateKey = (String) session.getAttribute("privateKey");
                 if (StringUtils.isEmpty(privateKey)) {
                     json.put("result", Result.failResult("获取公钥失败，请刷新页面"));
                 } else {
-                    String de_pass = RSAUtils.decrypt(user.getPassword(), (String) session.getAttribute("privateKey"));
-                    user.setPassword(de_pass);
-                    log_user = service.selectUserByPhoneAndPassword(user);
-                    if (log_user != null) {
-                        session.setAttribute("login_user", log_user);
+                    String dePass = RSAUtils.decrypt(user.getPassword(), (String) session.getAttribute("privateKey"));
+                    user.setPassword(dePass);
+                    logUser = service.selectUserByPhoneAndPassword(user);
+                    System.out.println(logUser);
+                    if (logUser != null) {
+                        session.setAttribute("login_user", logUser);
                         json.put("result", Result.successResult("登陆成功"));
 
                     } else {
@@ -66,9 +67,9 @@ public class UserController {
                     if (StringUtils.isEmpty(privateKey)) {
                         json.put("result", Result.failResult("你还没有获取公钥，请刷新页面"));
                     } else {
-                        String de_pass = RSAUtils.decrypt(user.getPassword(), privateKey);
-                        System.out.println("解密---私钥" + privateKey + "解密后" + de_pass);
-                        user.setPassword(de_pass);
+                        String dePass = RSAUtils.decrypt(user.getPassword(), privateKey);
+                        System.out.println("解密---私钥" + privateKey + "解密后" + dePass);
+                        user.setPassword(dePass);
                         if (service.insertUser(user) > 0) {
                             json.put("result", Result.successResult("成功注册"));
                         } else {

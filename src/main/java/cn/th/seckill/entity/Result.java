@@ -1,5 +1,7 @@
 package cn.th.seckill.entity;
 
+import com.github.pagehelper.PageInfo;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +15,7 @@ public class Result<T> {
     private Integer code;
     private List msg;
     private T data=null;
+    private Object pageInfo;
 
     public Result(Integer code,String msg) {
         this.msg= Collections.singletonList(msg);
@@ -77,6 +80,14 @@ public class Result<T> {
                 '}';
     }
 
+    public Object getPageInfo() {
+        return pageInfo;
+    }
+
+    public void setPageInfo(Object object) {
+        this.pageInfo= object;
+    }
+
     public Integer getCode() {
         return code;
     }
@@ -85,11 +96,11 @@ public class Result<T> {
         this.code = code;
     }
 
-    public List<String> getMsg() {
+    public List getMsg() {
         return msg;
     }
 
-    public void setMsg(List<String> msg) {
+    public void setMsg(List msg) {
         this.msg = msg;
     }
 

@@ -27,11 +27,15 @@
         select * from order_info where id=#{id}
     </select>
 
-    <insert id="insertOrderInfo">
+    <insert id="insertOrderInfo" useGeneratedKeys="true" keyProperty="id">
         insert into order_info(user_id, goods_id, info, goods_name, goods_count, goods_price, status) values (#{userId},#{goodsId},#{info},#{goodsName},#{goodsCount},#{goodsPrice},0)
     </insert>
 
     <delete id="deleteOrderById">
         delete from order_info where id=#{id}
     </delete>
+
+    <update id="updateOrderStatusById">
+        update order_info set status=1 where id=#{id}
+    </update>
 </mapper>

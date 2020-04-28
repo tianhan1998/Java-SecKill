@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * @author tianh
+ */
 @Controller
 public class JumpController {
 
-   /*
-   registry.addViewController("/secGoodDetail").setViewName("goods_detail");
-    */
     @GetMapping("/secGoodDetail/{id}")
     public String jumpToSecGoodDetail(Model m, @PathVariable String id){
         m.addAttribute("good_id",id);

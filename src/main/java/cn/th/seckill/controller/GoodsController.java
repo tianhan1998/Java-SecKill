@@ -31,8 +31,8 @@ public class GoodsController {
             if (sGoods.size() != 0) {
                 voGoods = new ArrayList<>();
                 for (SeckillGoods sgood:sGoods) {
-                    Goods temp_good=service.selectGoodById(sgood.getGoodsId());
-                    voGoods.add(new GoodsVo(temp_good,sgood));
+                    Goods tempGood=service.selectGoodById(sgood.getGoodsId());
+                    voGoods.add(new GoodsVo(tempGood,sgood));
                 }
                 System.out.println(voGoods);
                 json.put("result",Result.successResult("查找成功",voGoods));
@@ -53,7 +53,7 @@ public class GoodsController {
         Goods good;
         GoodsVo goodsVo;
         try{
-            sec_good=service.selectSecGoodById(Long.parseLong(id));
+            sec_good=service.selectSecGoodByGoodId(Long.parseLong(id));
             if(sec_good!=null){
                 good=service.selectGoodById(sec_good.getGoodsId());
                 goodsVo=new GoodsVo(good,sec_good);

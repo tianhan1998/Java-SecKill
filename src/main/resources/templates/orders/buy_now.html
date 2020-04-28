@@ -88,7 +88,7 @@
         </tr>
         <tr>
             <td></td>
-            <td><button id="pay" v-on:click="pay" type="button" class="btn-block btn btn-success">立即支付</button></td>
+            <td><button id="pay" @click="createOrder" type="button" class="btn-block btn btn-success">立即支付</button></td>
             <td></td>
             <td></td>
             <td/>
@@ -123,14 +123,14 @@
             });
         },
         methods:{
-            pay:function () {
+            createOrder:function () {
                 var self=this;
                 axios({
-                    url:context+"/pay",
+                    url:context+"/order",
                     method:'POST',
                     data:{
                         'goodsId':self.goodId,
-                        'info':$("#address").val()+' '+$("#trueName").val()+$("#phone").val(),
+                        'info':$("#address").val()+' '+$("#trueName").val()+''+$("#phone").val(),
                         'goodsName':self.data.goodsName,
                         'goodsCount':1,
                         'goodsPrice':self.data.goodsPrice,
@@ -138,7 +138,7 @@
                 }).then(response=>{
                     if(response.data.result.code===200){
                         swal(response.data.result.msg[0],{icon:"success"}).then(function () {
-                            window.location.href=context+"orders";
+                            window.location.href=context+"orderDetail/"+response.data.result.data.id;
                         });
                     }else{
                         console.log(response.data.result);

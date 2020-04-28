@@ -17,7 +17,8 @@ public class OrdersVO {
     private Integer status;
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     private Date createDate;
-    private String address;
+    private String info;//订单的组合地址
+    private String address;//用户的收货地址
     private String nickName;
     private Integer goodsCount;//订单购买量
     private String trueName;
@@ -33,12 +34,21 @@ public class OrdersVO {
                 ", goodsPrice=" + goodsPrice +
                 ", status=" + status +
                 ", createDate=" + createDate +
+                ", info='" + info + '\'' +
                 ", address='" + address + '\'' +
                 ", nickName='" + nickName + '\'' +
                 ", goodsCount=" + goodsCount +
                 ", trueName='" + trueName + '\'' +
                 ", phone='" + phone + '\'' +
                 '}';
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getTrueName() {
@@ -61,7 +71,7 @@ public class OrdersVO {
     }
     public OrdersVO(User user){
         this.trueName=user.getTrueName();
-        this.address=user.getAddress();
+        this.info =user.getAddress();
         this.phone=user.getPhone();
         this.nickName = user.getNickname();
     }
@@ -79,14 +89,16 @@ public class OrdersVO {
         this.orderId=info.getId();
         this.status = info.getStatus();
         this.createDate = info.getCreateDate();
-        this.address = info.getInfo();
+        this.info = info.getInfo();
     }
     public OrdersVO(Goods good, OrderInfo info, User user) {
+        this.orderId=info.getId();
         this.goodsId=good.getId();
+        this.trueName=user.getTrueName();
         this.nickName = user.getNickname();
         this.status = info.getStatus();
         this.createDate = info.getCreateDate();
-        this.address = info.getInfo();
+        this.info = info.getInfo();
         this.goodsName = good.getGoodsName();
         this.goodsImg = good.getGoodsImg();
         this.goodsPrice = good.getGoodsPrice();
@@ -124,12 +136,12 @@ public class OrdersVO {
         this.nickName = nickName;
     }
 
-    public String getAddress() {
-        return address;
+    public String getInfo() {
+        return info;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setInfo(String info) {
+        this.info = info;
     }
 
     public String getGoodsName() {

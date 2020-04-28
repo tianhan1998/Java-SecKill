@@ -11,7 +11,7 @@
         <result column="password" property="password"/>
         <result column="register_date" property="registerDate"/>
         <result column="last_login_date" property="lastLoginDate"/>
-        <result column="address" property="address"/>
+        <result column="info" property="info"/>
         <result column="true_name" property="trueName"/>
     </resultMap>
 

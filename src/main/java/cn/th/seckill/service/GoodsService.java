@@ -10,4 +10,5 @@ public interface GoodsService {
     List<SeckillGoods> selectAllSecGood();
     SeckillGoods selectSecGoodById(Long id);
     Goods selectGoodById(Long id);
+    SeckillGoods selectSecGoodByGoodId(Long id);
 }

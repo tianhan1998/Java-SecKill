@@ -47,6 +47,54 @@
         #goodslist td {
             border-top: 1px solid #39503f61;
         }
+        .page-bar{
+            margin:40px auto;
+            margin-top: 150px;
+
+        }
+        ul,li{
+            margin: 0px;
+            padding: 0px;
+        }
+        li{
+            list-style: none
+        }
+        .page-bar li:first-child>a {
+            margin-left: 0px
+        }
+        .page-bar a{
+            border: 1px solid #ddd;
+            text-decoration: none;
+            position: relative;
+            float: left;
+            padding: 6px 12px;
+            margin-left: -1px;
+            line-height: 1.42857143;
+            color: #5D6062;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+        .page-bar a:hover{
+            background-color: #eee;
+        }
+        .page-bar a.banclick{
+            cursor:not-allowed;
+        }
+        .page-bar .active a{
+            color: #fff;
+            cursor: default;
+            background-color: #5cb85c;
+            border-color: #4cae4c;
+        }
+        .page-bar i{
+            font-style:normal;
+            color: #398439;
+            margin: 0px 4px;
+            font-size: 12px;
+        }
+        .page-bar li{
+            display: inline;
+        }
     </style>
 </head>
 <body class="top-navigation">
@@ -74,11 +122,27 @@
             <td v-if="item.status == 3">已收货</td>
             <td v-if="item.status == 4">已退款</td>
             <td v-if="item.status == 5">已完成</td>
-            <td><a :href="contextpath+'pay/'+item.goodsId"><button id="pay" type="button" class="btn btn-success">立即支付</button></a>
-                <button type="button" @click="deleteOrder(item.orderId)" class="btn btn-danger">删除订单</button>
+            <td><button v-if="item.status == 0" id="pay" @click="pay(item.orderId)" type="button" class="btn btn-success">立即支付</button>
+                <button v-if="item.status == 0" type="button" @click="deleteOrder(item.orderId)" class="btn btn-danger">删除订单</button>
             </td>
         </tr>
     </table>
+    <!--分页-->
+    <div class="page-bar" style="text-align: center">
+        <ul style="display: inline-block">
+            <li v-if="cur != 1"><a @click="getData(1)">首页</a></li>
+            <li v-if="cur == 1"><a class="banclick">首页</a></li>
+            <li v-if="cur > 1"><a @click="getData(--cur)">上一页</a></li>
+            <li v-if="cur == 1"><a class="banclick">上一页</a></li>
+            <li v-for="index in indexs" :class="{ 'active': cur == index}">
+                <a @click="getData(index)">{{ index }}</a>
+            </li>
+            <li v-if="cur != pages"><a @click="getData(++cur)">下一页</a></li>
+            <li v-if="cur != pages"><a @click="getData(pages)">尾页</a></li>
+            <li v-if="cur == pages"><a class="banclick">尾页</a></li>
+            <li><a>共<i>{{pages}}</i>页</a></li>
+        </ul>
+    </div>
 </div>
 <script th:src="@{/js/sweetalert.min.js}"></script>
 <script type="text/javascript">
@@ -87,24 +151,61 @@
         el:'#table',
         data:{
             contextpath:'[[@{/}]]',
-            orders:[]
+            orders:[],
+            pages:1,//总页数
+            cur:1, //当前页面
+        },
+        computed:{
+            indexs: function(){
+                var left = 1;
+                var right = this.pages;
+                var ar = [];
+                if(this.pages>= 5){
+                    if(this.cur > 3 && this.cur < this.pages-2){
+                        left = this.cur - 2
+                        right = this.cur + 2
+                    }else{
+                        if(this.cur<=3){
+                            left = 1
+                            right = 5
+                        }else{
+                            right = this.pages
+                            left = this.pages-4
+                        }
+                    }
+                }
+                while (left <= right){
+                    ar.push(left)
+                    left ++
+                }
+                return ar
+            }
         },
         mounted:function(){
-            var self=this;
-            axios({
-                method: 'get',
-                url: context+'order',
-            }).then(response=>{
-                if(response.data.result.code===200) {
-                    self.orders = response.data.result.data;
-                }else{
-                    console.log(response.result);
-                }
-            }).catch(response=>{
-                console.log(response);
-            });
+            this.getData(1);
         },
         methods:{
+            getData:function(pageNum){
+                var self=this;
+                axios({
+                    method: 'get',
+                    url: context+'order',
+                    params:{
+                        'pageNum':pageNum,
+                    }
+                }).then(response=>{
+                    if(response.data.result.code===200) {
+                        console.log(response.data.result);
+                        self.orders = response.data.result.data;
+                        self.pages=response.data.result.pageInfo.pages;
+                        self.cur=response.data.result.pageInfo.pageNum;
+                    }else{
+                        console.log(response.result);
+                    }
+                }).catch(response=>{
+                    console.log(response);
+                });
+            },
             deleteOrder:function (id) {
                 var self=this;
                 swal({
@@ -131,6 +232,25 @@
                         });
                     }
                 })
+            },
+            pay:function (id) {
+                var self=this;
+                axios({
+                    url:self.contextpath+'pay/'+id,
+                    method:'POST'
+                }).then(response=>{
+                    if(response.data.result.code===200){
+                        swal("支付成功",{icon:"success"}).then(function () {
+                            window.location.href=self.contextpath+"orders";
+                        })
+                    }else{
+                        swal(response.data.result.msg,{icon:"error"}).then(function () {
+                            window.location.reload();
+                        })
+                    }
+                }).catch(response=>{
+                    console.log(response);
+                });
             }
         }
     });

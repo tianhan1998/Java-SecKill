@@ -17,4 +17,5 @@ public interface GoodsMapper {
     SeckillGoods selectSecGoodById(Long id);
     int decStockCount(Long id);
     int incStockCount(Long id);
+    SeckillGoods selectSecGoodByGoodId(Long id);
 }

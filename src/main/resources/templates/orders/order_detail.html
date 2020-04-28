@@ -55,12 +55,12 @@
              <span v-if="order.status == 5">已完成</span>
         </td>
         <td>
-        	<button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
+        	<button class="btn btn-primary btn-block" @click="pay(order.orderId)" type="button" id="payButton">立即支付</button>
         </td>
      </tr>
       <tr>
      		<td>收货人</td>
-        	<td colspan="2">{{order.nickName}}</td>
+        	<td colspan="2">{{order.trueName}}</td>
      </tr>
      <tr>
      		<td>收货信息</td>
@@ -68,6 +68,7 @@
      </tr>
   </table>
 </div>
+<script th:src="@{/js/sweetalert.min.js}"></script>
 <script type="text/javascript">
     new Vue({
         el:'#app',
@@ -86,11 +87,36 @@
                     self.order=response.data.result.data;
                     console.log(response.data.result);
                 }else{
-                    console.log(response);
+                    swal(response.data.result.msg[0],{
+                        icon:"error"
+                    }).then(function () {
+                        window.location.href=self.contextpath+"orders";
+                    })
                 }
             }).catch(response=>{
                 console.log(response);
             });
+        },
+        methods:{
+            pay:function (id) {
+                var self=this;
+                axios({
+                    url:self.contextpath+'pay/'+id,
+                    method:'POST'
+                }).then(response=>{
+                    if(response.data.result.code===200){
+                        swal("支付成功",{icon:"success"}).then(function () {
+                            window.location.reload();
+                        })
+                    }else{
+                        swal(response.data.result.msg,{icon:"error"}).then(function () {
+                            window.location.reload();
+                        })
+                    }
+                }).catch(response=>{
+                    console.log(response);
+                });
+            }
         }
     });
 </script>

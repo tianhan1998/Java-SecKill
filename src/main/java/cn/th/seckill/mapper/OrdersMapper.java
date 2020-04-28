@@ -13,4 +13,5 @@ public interface OrdersMapper {
     OrderInfo selectOrderById(Long id);
     int insertOrderInfo(OrderInfo info);
     int deleteOrderById(Long id);
+    int updateOrderStatusById(Long id);
 }

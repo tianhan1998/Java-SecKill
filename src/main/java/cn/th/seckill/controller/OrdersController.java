@@ -1,14 +1,12 @@
 package cn.th.seckill.controller;
 
-import cn.th.seckill.entity.Goods;
-import cn.th.seckill.entity.OrderInfo;
-import cn.th.seckill.entity.Result;
-import cn.th.seckill.entity.User;
+import cn.th.seckill.entity.*;
 import cn.th.seckill.entity.vo.OrdersVO;
 import cn.th.seckill.service.GoodsService;
 import cn.th.seckill.service.OrdersService;
 import cn.th.seckill.service.UserService;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +15,9 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author tianh
+ */
 @RestController
 public class OrdersController {
 
@@ -27,6 +28,11 @@ public class OrdersController {
     @Resource
     UserService userService;
 
+    /**
+     * 根据id获取订单信息
+     * @param id 订单id
+     * @return json
+     */
     @GetMapping("/order/{id}")
     public JSONObject orderDetail(@PathVariable String id) {
         JSONObject json = new JSONObject();
@@ -58,20 +64,26 @@ public class OrdersController {
         }
         return json;
     }
+
+    /**
+     * 获取所有订单
+     * @param session 从session中取用户id
+     * @return json
+     */
     @GetMapping("/order")
-    public JSONObject selectAllOrder(HttpSession session) {
+    public JSONObject selectAllOrder(HttpSession session,@RequestParam(value = "pageNum",required = true,defaultValue = "1") int pageNum) {
         JSONObject json = new JSONObject();
-        List<OrderInfo> list=null;
+        PageInfo<OrderInfo> list=null;
         List<OrdersVO> voLists=null;
         try {
-            User login_user= (User) session.getAttribute("login_user");
-            list= ordersService.selectAllOrdersByUserId(login_user.getId());
-            if(list.size()!=0){
+            User loginUser= (User) session.getAttribute("login_user");
+            list= ordersService.selectAllOrdersByUserId(loginUser.getId(), pageNum);
+            if(list.getSize()!=0){
                 voLists=new ArrayList<>();
-                for(OrderInfo orderInfo:list) {
+                for(OrderInfo orderInfo:list.getList()) {
                     Goods good=goodsService.selectGoodById(orderInfo.getGoodsId());
                         voLists.add(new OrdersVO(orderInfo) {{
-                            this.setNickName(login_user.getNickname());
+                            this.setTrueName(loginUser.getTrueName());
                             if(good!=null) {
                             this.setGoodsImg(good.getGoodsImg());
                             this.setGoodsId(good.getId());
@@ -80,8 +92,9 @@ public class OrdersController {
                             }
                         }});
                 }
-//                System.out.println(voLists);
-                json.put("result", Result.successResult("查找成功", voLists));
+                Result<Object> result=Result.successResult("查找成功",voLists);
+                result.setPageInfo(list);
+                json.put("result", result);
             }else{
                 json.put("result",Result.failResult("查找失败"));
             }
@@ -91,7 +104,14 @@ public class OrdersController {
         }
         return json;
     }
-    @GetMapping("buyNow")
+
+    /**
+     * 传送准备购买页面数据
+     * @param session session取用户信息
+     * @param goodId 取准备购买的商品信息
+     * @return json
+     */
+    @GetMapping("/buyNow")
     public JSONObject buyNow(HttpSession session,String goodId){
         JSONObject json=new JSONObject();
         try{
@@ -116,27 +136,45 @@ public class OrdersController {
         }
         return json;
     }
-    @PostMapping("/pay")
-    public JSONObject pay(@RequestBody OrderInfo order,HttpSession session){
-         JSONObject json=new JSONObject();
-         try{
-             if(order!=null){
-                 User user= (User) session.getAttribute("login_user");
-                 order.setUserId(user.getId());
-                if(ordersService.insertOrder(order)){
-                    json.put("result",Result.successResult("下单成功，请尽快支付"));
-                }else{
-                    json.put("result",Result.failResult("下单失败"));
+
+    /**
+     * 创建订单
+     * @param order 订单，从请求体中取(axios post data)
+     * @param session 从session中取用户信息
+     * @return json
+     */
+    @PostMapping("/order")
+    public JSONObject createOrder(@RequestBody OrderInfo order,HttpSession session) {
+        JSONObject json = new JSONObject();
+        try {
+            SeckillGoods good = goodsService.selectSecGoodById(order.getGoodsId());
+            if (order != null&&!StringUtils.isEmpty(order.getGoodsId())) {
+                if (good.getStockCount() > 0) {
+                    User user = (User) session.getAttribute("login_user");
+                    order.setUserId(user.getId());
+                    if (ordersService.insertOrder(order)) {
+                        json.put("result", Result.successResult("下单成功，请尽快支付", order));
+                    } else {
+                        json.put("result", Result.failResult("下单失败"));
+                    }
+                } else {
+                    json.put("result", Result.failResult("商品已售完"));
                 }
-             }else{
-                 json.put("result",Result.failResult("参数有误"));
-             }
-         } catch (Exception e) {
-             e.printStackTrace();
-             json.put("result", Result.exceptionResult(e.getMessage()));
-         }
-         return json;
+            } else {
+                json.put("result", Result.failResult("参数有误"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.put("result", Result.exceptionResult(e.getMessage()));
+        }
+        return json;
     }
+
+    /**
+     * 根据id删除订单
+     * @param id 删除订单id
+     * @return json
+     */
     @DeleteMapping("/order/{id}")
     public JSONObject deleteOrder(@PathVariable String id){
         JSONObject json=new JSONObject();
@@ -150,6 +188,37 @@ public class OrdersController {
                 }
             }else{
                 json.put("result",Result.failResult("查找订单信息失败"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.put("result", Result.exceptionResult(e.getMessage()));
+        }
+        return json;
+    }
+
+    /**
+     * 根据订单id开始付款
+     * @param id 订单id
+     * @return json
+     */
+    @PostMapping("/pay/{id}")
+    public JSONObject pay(@PathVariable String id){
+        JSONObject json=new JSONObject();
+        try{
+            if(!StringUtils.isEmpty(id)) {
+                OrderInfo info=ordersService.selectOrderById(Long.parseLong(id));
+                if(info!=null) {
+                    Thread.sleep(1000);
+                    if (ordersService.updateOrderStatusById(Long.parseLong(id)) > 0) {
+                        json.put("result", Result.successResult("支付成功"));
+                    } else {
+                        json.put("result", Result.failResult("支付失败"));
+                    }
+                }else{
+                    json.put("result",Result.failResult("获取订单信息失败"));
+                }
+            }else{
+                json.put("result",Result.failResult("参数有误"));
             }
         } catch (Exception e) {
             e.printStackTrace();
