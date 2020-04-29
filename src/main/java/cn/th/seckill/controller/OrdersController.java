@@ -15,6 +15,8 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cn.th.seckill.entity.Result.*;
+
 /**
  * @author tianh
  */
@@ -48,19 +50,19 @@ public class OrdersController {
                     user=userService.selectUserById(orderInfo.getUserId());
                     if(user!=null) {
                         vo=new OrdersVO(good,orderInfo,user);
-                        json.put("result", Result.successResult("查找成功", vo));
+                        json.put("result", successResult("查找成功", vo));
                     }else{
-                        json.put("result",Result.failResult("获取购买人信息失败"));
+                        json.put("result", failResult("获取购买人信息失败"));
                     }
                 }else{
-                    json.put("result",Result.failResult("获取商品信息失败"));
+                    json.put("result", failResult("获取商品信息失败"));
                 }
             }else{
-                json.put("result",Result.failResult("获取订单信息失败"));
+                json.put("result", failResult("获取订单信息失败"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("result",Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
     }
@@ -71,13 +73,13 @@ public class OrdersController {
      * @return json
      */
     @GetMapping("/order")
-    public JSONObject selectAllOrder(HttpSession session,@RequestParam(value = "pageNum",required = true,defaultValue = "1") int pageNum) {
+    public JSONObject selectAllOrder(HttpSession session,@RequestParam(value = "pageNum", defaultValue = "1") String pageNum) {
         JSONObject json = new JSONObject();
         PageInfo<OrderInfo> list=null;
         List<OrdersVO> voLists=null;
         try {
             User loginUser= (User) session.getAttribute("login_user");
-            list= ordersService.selectAllOrdersByUserId(loginUser.getId(), pageNum);
+            list= ordersService.selectAllOrdersByUserId(loginUser.getId(), Integer.parseInt(pageNum));
             if(list.getSize()!=0){
                 voLists=new ArrayList<>();
                 for(OrderInfo orderInfo:list.getList()) {
@@ -92,15 +94,15 @@ public class OrdersController {
                             }
                         }});
                 }
-                Result<Object> result=Result.successResult("查找成功",voLists);
+                Result<Object> result= successResult("查找成功",voLists);
                 result.setPageInfo(list);
                 json.put("result", result);
             }else{
-                json.put("result",Result.failResult("查找失败"));
+                json.put("result", failResult("查找失败"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("result",Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
     }
@@ -123,16 +125,16 @@ public class OrdersController {
                     ordersVO.setTrueName(user.getTrueName());
                     ordersVO.setAddress(user.getAddress());
                     ordersVO.setPhone(user.getPhone());
-                    json.put("result", Result.successResult("信息查找成功", ordersVO));
+                    json.put("result", successResult("信息查找成功", ordersVO));
                 } else {
-                    json.put("result", Result.failResult("商品信息查找失败"));
+                    json.put("result", failResult("商品信息查找失败"));
                 }
             }else{
-                json.put("result",Result.failResult("参数错误"));
+                json.put("result", failResult("参数错误"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("result", Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
     }
@@ -147,25 +149,16 @@ public class OrdersController {
     public JSONObject createOrder(@RequestBody OrderInfo order,HttpSession session) {
         JSONObject json = new JSONObject();
         try {
-            SeckillGoods good = goodsService.selectSecGoodById(order.getGoodsId());
-            if (order != null&&!StringUtils.isEmpty(order.getGoodsId())) {
-                if (good.getStockCount() > 0) {
-                    User user = (User) session.getAttribute("login_user");
-                    order.setUserId(user.getId());
-                    if (ordersService.insertOrder(order)) {
-                        json.put("result", Result.successResult("下单成功，请尽快支付", order));
-                    } else {
-                        json.put("result", Result.failResult("下单失败"));
-                    }
-                } else {
-                    json.put("result", Result.failResult("商品已售完"));
-                }
+            User user = (User) session.getAttribute("login_user");
+            order.setUserId(user.getId());
+            if (ordersService.insertOrder(order)) {
+                json.put("result", successResult("下单成功，请尽快支付", order));
             } else {
-                json.put("result", Result.failResult("参数有误"));
+                json.put("result", failResult("商品已售完"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("result", Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
     }
@@ -182,16 +175,16 @@ public class OrdersController {
             OrderInfo order=ordersService.selectOrderById(Long.parseLong(id));
             if(order!=null){
                 if(ordersService.deleteOrder(order)){
-                    json.put("result",Result.successResult("删除订单成功"));
+                    json.put("result", successResult("删除订单成功"));
                 }else{
-                    json.put("result",Result.failResult("删除订单失败"));
+                    json.put("result", failResult("删除订单失败"));
                 }
             }else{
-                json.put("result",Result.failResult("查找订单信息失败"));
+                json.put("result", failResult("查找订单信息失败"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("result", Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
     }
@@ -210,19 +203,19 @@ public class OrdersController {
                 if(info!=null) {
                     Thread.sleep(1000);
                     if (ordersService.updateOrderStatusById(Long.parseLong(id)) > 0) {
-                        json.put("result", Result.successResult("支付成功"));
+                        json.put("result", successResult("支付成功"));
                     } else {
-                        json.put("result", Result.failResult("支付失败"));
+                        json.put("result", failResult("支付失败"));
                     }
                 }else{
-                    json.put("result",Result.failResult("获取订单信息失败"));
+                    json.put("result", failResult("获取订单信息失败"));
                 }
             }else{
-                json.put("result",Result.failResult("参数有误"));
+                json.put("result", failResult("参数有误"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("result", Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
     }

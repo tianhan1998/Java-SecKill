@@ -44,4 +44,7 @@
     <update id="incStockCount">
         update goods_seckill set stock_count=stock_count+1 where stock_count>=0 and id=#{id}
     </update>
+    <select id="selectStockCountByGoodId" resultType="int">
+        select stock_count from goods_seckill where goods_id=#{id}
+    </select>
 </mapper>

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * @author tianh
+ */
 @Repository
 public interface GoodsMapper {
     List<Goods> selectAllGoods();
@@ -18,4 +21,5 @@ public interface GoodsMapper {
     int decStockCount(Long id);
     int incStockCount(Long id);
     SeckillGoods selectSecGoodByGoodId(Long id);
+    Integer selectStockCountByGoodId(Long id);
 }

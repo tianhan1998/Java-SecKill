@@ -9,16 +9,28 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.redis.cache.CacheKeyPrefix;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import javax.annotation.Resource;
 import java.net.UnknownHostException;
 
+/**
+ * @author tianh
+ */
 @Configuration
 public class RedisConfig {
+    public CacheKeyPrefix myCacheKeyPrefix(){
+        return cacheName -> cacheName+":";
+    }
+
     @Bean
     @Primary
     public RedisTemplate<String, Goods> goodsRedisTemplate(RedisConnectionFactory redisConnectionFactory) throws UnknownHostException{
@@ -44,19 +56,25 @@ public class RedisConfig {
     @Bean
     @Primary
     RedisCacheManager redisGoodCacheManager(RedisConnectionFactory redisConnectionFactory){
-        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(Goods.class)));
+        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(Goods.class))).computePrefixWith(myCacheKeyPrefix());
         RedisCacheManager.RedisCacheManagerBuilder manager= RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration);
         return manager.build();
     }
     @Bean
     RedisCacheManager redisOrderCacheManager(RedisConnectionFactory redisConnectionFactory){
-        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(OrderInfo.class)));
+        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(OrderInfo.class))).computePrefixWith(myCacheKeyPrefix());
         RedisCacheManager.RedisCacheManagerBuilder manager= RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration);
         return manager.build();
     }
     @Bean
     RedisCacheManager redisSecGoodsCacheManager(RedisConnectionFactory redisConnectionFactory){
-        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(SeckillGoods.class)));
+        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(SeckillGoods.class))).computePrefixWith(myCacheKeyPrefix());
+        RedisCacheManager.RedisCacheManagerBuilder manager= RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration);
+        return manager.build();
+    }
+    @Bean
+    RedisCacheManager redisObjectCacheManager(RedisConnectionFactory redisConnectionFactory){
+        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new Jackson2JsonRedisSerializer<>(Object.class))).computePrefixWith(myCacheKeyPrefix());
         RedisCacheManager.RedisCacheManagerBuilder manager= RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration);
         return manager.build();
     }

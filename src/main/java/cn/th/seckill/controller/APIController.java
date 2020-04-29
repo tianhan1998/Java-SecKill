@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 
+import static cn.th.seckill.entity.Result.successResult;
+
 @RestController
 @RequestMapping("/api")
 public class APIController {
@@ -23,7 +25,7 @@ public class APIController {
             if(rsa!=null){
                 RSABean rsaBean=rsa.getRandomKey();
                 session.setAttribute("privateKey",rsaBean.getPrivateKey());
-                json.put("result", Result.successResult("获取公钥成功",rsaBean.getPublicKey()));
+                json.put("result", successResult("获取公钥成功",rsaBean.getPublicKey()));
             }else{
                 json.put("result",Result.failResult("RSA实例出现问题"));
             }

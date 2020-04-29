@@ -147,13 +147,14 @@
 <script th:src="@{/js/sweetalert.min.js}"></script>
 <script type="text/javascript">
     var context="[[@{/}]]";
+    var pageNum="[[${pageNum}]]";
     new Vue({
         el:'#table',
         data:{
             contextpath:'[[@{/}]]',
             orders:[],
             pages:1,//总页数
-            cur:1, //当前页面
+            cur:pageNum, //当前页面
         },
         computed:{
             indexs: function(){
@@ -182,7 +183,12 @@
             }
         },
         mounted:function(){
-            this.getData(1);
+            const self = this;
+            if(self.cur!=="") {
+                this.getData(pageNum);
+            }else{
+                this.getData(1)
+            }
         },
         methods:{
             getData:function(pageNum){
@@ -222,7 +228,7 @@
                         }).then(response=>{
                             if(response.data.result.code===200){
                                 swal(response.data.result.msg[0],{icon:"success"}).then(function () {
-                                    window.location.reload();
+                                    window.location.href=self.contextpath+"orders?pageNum="+self.cur;
                                 });
                             }else{
                                 swal(response.data.result,{icon:"error"});
@@ -241,7 +247,7 @@
                 }).then(response=>{
                     if(response.data.result.code===200){
                         swal("支付成功",{icon:"success"}).then(function () {
-                            window.location.href=self.contextpath+"orders";
+                            window.location.href=self.contextpath+"orders?pageNum="+self.cur;
                         })
                     }else{
                         swal(response.data.result.msg,{icon:"error"}).then(function () {

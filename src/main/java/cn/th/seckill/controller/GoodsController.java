@@ -7,6 +7,7 @@ import cn.th.seckill.entity.vo.GoodsVo;
 import cn.th.seckill.service.GoodsService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,32 +17,39 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static cn.th.seckill.entity.Result.*;
+
+/**
+ * @author tianh
+ */
 @RestController
 public class GoodsController {
     @Resource
     GoodsService service;
 
     @GetMapping("/secGoods")
-    public JSONObject getAllSecGoods() {
-        List<SeckillGoods> sGoods;
-        List<GoodsVo> voGoods=null;
+    public JSONObject getAllSecGoods(@RequestParam(value = "pageNum",defaultValue = "1") String pageNum) {
+        List<GoodsVo> voGoods;
+        PageInfo<SeckillGoods> pageInfo;
         JSONObject json = new JSONObject();
         try {
-            sGoods = service.selectAllSecGood();
-            if (sGoods.size() != 0) {
+            pageInfo = service.selectAllSecGood(Integer.parseInt(pageNum));
+            if (pageInfo.getList().size() != 0) {
                 voGoods = new ArrayList<>();
-                for (SeckillGoods sgood:sGoods) {
-                    Goods tempGood=service.selectGoodById(sgood.getGoodsId());
-                    voGoods.add(new GoodsVo(tempGood,sgood));
+                for (SeckillGoods sGood:pageInfo.getList()) {
+                    Goods tempGood=service.selectGoodById(sGood.getGoodsId());
+                    voGoods.add(new GoodsVo(tempGood,sGood));
                 }
                 System.out.println(voGoods);
-                json.put("result",Result.successResult("查找成功",voGoods));
+                Result<Object> result=successResult("查找成功",voGoods);
+                result.setPageInfo(pageInfo);
+                json.put("result",result);
             } else {
-                json.put("result",Result.failResult("未找到相关商品"));
+                json.put("result", failResult("未找到相关商品"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            json.put("result",Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
     }
@@ -55,15 +63,16 @@ public class GoodsController {
         try{
             sec_good=service.selectSecGoodByGoodId(Long.parseLong(id));
             if(sec_good!=null){
+                sec_good.setStockCount(service.selectStockCountByGoodId(sec_good.getGoodsId()));
                 good=service.selectGoodById(sec_good.getGoodsId());
                 goodsVo=new GoodsVo(good,sec_good);
-                json.put("result",Result.successResult("查找成功",goodsVo));
+                json.put("result", successResult("查找成功",goodsVo));
             }else{
-                json.put("result",Result.failResult("未找到相关商品"));
+                json.put("result", failResult("未找到相关商品"));
             }
         }catch(Exception e){
             e.printStackTrace();
-            json.put("result",Result.exceptionResult(e.getMessage()));
+            json.put("result", exceptionResult(e.getMessage()));
         }
             return json;
     }

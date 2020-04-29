@@ -27,4 +27,9 @@ public class JumpController {
         m.addAttribute("good_id",id);
         return "/orders/buy_now";
     }
+    @GetMapping("/orders")
+    public String jumpToOrdersList(Model m,String pageNum){
+        m.addAttribute("pageNum",pageNum);
+        return "/orders/orders_list";
+    }
 }
