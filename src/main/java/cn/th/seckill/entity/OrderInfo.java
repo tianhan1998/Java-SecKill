@@ -16,6 +16,7 @@ public class OrderInfo {
     private Integer status;
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     private Date createDate;
+    private String token;
 
     @Override
     public String toString() {
@@ -23,13 +24,22 @@ public class OrderInfo {
                 "id=" + id +
                 ", userId=" + userId +
                 ", goodsId=" + goodsId +
-                ", address='" + info + '\'' +
+                ", info='" + info + '\'' +
                 ", goodsName='" + goodsName + '\'' +
                 ", goodsCount=" + goodsCount +
                 ", goodsPrice=" + goodsPrice +
                 ", status=" + status +
                 ", createDate=" + createDate +
+                ", token='" + token + '\'' +
                 '}';
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Long getId() {

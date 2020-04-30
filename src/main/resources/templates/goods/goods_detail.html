@@ -23,6 +23,7 @@
     <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
     <!-- common.js -->
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/sweetalert.min.js}"></script>
 </head>
 <body class="top-navigation" style="background: no-repeat">
     <div id="app" class="panel panel-default">
@@ -91,7 +92,18 @@
         methods:{
            buy:function () {
                var self=this;
-               window.location.href=self.contextpath+"buy/"+[[${good_id}]];
+               axios({
+                   url:self.contextpath+"api/getTokenThenBuy/"+[[${good_id}]],
+                   method:'GET',
+               }).then(response=>{
+                   if(response.data.result.code===200){
+                       window.location.href=self.contextpath+"buy?id="+[[${good_id}]]+"&token="+response.data.result.data;
+                   }else{
+                       swal(response.data.result.msg[0]);
+                   }
+               }).catch(response=>{
+                    console.log(response);
+               });
            }
         }
     });

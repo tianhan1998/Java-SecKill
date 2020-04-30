@@ -22,9 +22,10 @@ public class JumpController {
         m.addAttribute("order_id",id);
         return "/orders/order_detail";
     }
-    @GetMapping("/buy/{id}")
-    public String jumpToBuyNow(Model m, @PathVariable String id){
+    @GetMapping("/buy")
+    public String jumpToBuyNow(Model m,String id,String token){
         m.addAttribute("good_id",id);
+        m.addAttribute("token",token);
         return "/orders/buy_now";
     }
     @GetMapping("/orders")

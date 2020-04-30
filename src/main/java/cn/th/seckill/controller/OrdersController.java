@@ -7,6 +7,7 @@ import cn.th.seckill.service.OrdersService;
 import cn.th.seckill.service.UserService;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,9 @@ public class OrdersController {
     GoodsService goodsService;
     @Resource
     UserService userService;
+
+    @Resource(name="redisTemplate")
+    RedisTemplate<Object,Object> redisTemplate;
 
     /**
      * 根据id获取订单信息
@@ -149,12 +153,17 @@ public class OrdersController {
     public JSONObject createOrder(@RequestBody OrderInfo order,HttpSession session) {
         JSONObject json = new JSONObject();
         try {
-            User user = (User) session.getAttribute("login_user");
-            order.setUserId(user.getId());
-            if (ordersService.insertOrder(order)) {
-                json.put("result", successResult("下单成功，请尽快支付", order));
-            } else {
-                json.put("result", failResult("商品已售完"));
+            Boolean result=redisTemplate.opsForSet().isMember("checkToken:goodsId:"+order.getGoodsId(),order.getToken());
+            if(result!=null&&result) {
+                User user = (User) session.getAttribute("login_user");
+                order.setUserId(user.getId());
+                if (ordersService.insertOrder(order)) {
+                    json.put("result", successResult("下单成功，请尽快支付", order));
+                } else {
+                    json.put("result", failResult("商品已售完"));
+                }
+            }else{
+                json.put("result",failResult("token有误，请进入商品界面重新购买"));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -54,6 +54,13 @@ public class RedisConfig {
         return goodsRedisTemplate;
     }
     @Bean
+    public RedisTemplate<Object,Object> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+        RedisTemplate<Object, Object> template = new RedisTemplate();
+        template.setDefaultSerializer(new StringRedisSerializer());
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
+    }
+    @Bean
     @Primary
     RedisCacheManager redisGoodCacheManager(RedisConnectionFactory redisConnectionFactory){
         RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(Goods.class))).computePrefixWith(myCacheKeyPrefix());
@@ -78,6 +85,11 @@ public class RedisConfig {
         RedisCacheManager.RedisCacheManagerBuilder manager= RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration);
         return manager.build();
     }
-
+    @Bean
+    RedisCacheManager redisStringCacheManager(RedisConnectionFactory redisConnectionFactory){
+        RedisCacheConfiguration configuration=RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())).computePrefixWith(myCacheKeyPrefix());
+        RedisCacheManager.RedisCacheManagerBuilder manager= RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration);
+        return manager.build();
+    }
 
 }

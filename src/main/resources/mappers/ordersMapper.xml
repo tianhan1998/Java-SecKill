@@ -14,6 +14,7 @@
         <result column="goods_price" property="goodsPrice"/>
         <result column="status" property="status"/>
         <result column="create_date" property="createDate"/>
+        <result column="token" property="token"/>
     </resultMap>
     <select id="selectAllOrders" resultType="List">
         select * from order_info
@@ -28,7 +29,7 @@
     </select>
 
     <insert id="insertOrderInfo" useGeneratedKeys="true" keyProperty="id">
-        insert into order_info(user_id, goods_id, info, goods_name, goods_count, goods_price, status) values (#{userId},#{goodsId},#{info},#{goodsName},#{goodsCount},#{goodsPrice},0)
+        insert into order_info(user_id, goods_id, info, goods_name, goods_count, goods_price, status,token) values (#{userId},#{goodsId},#{info},#{goodsName},#{goodsCount},#{goodsPrice},0,#{token})
     </insert>
 
     <delete id="deleteOrderById">
