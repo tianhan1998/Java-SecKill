@@ -6,17 +6,15 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 @Component
-public class RedisUtils {
+public class RedisUtils{
     @Resource(name = "redisTemplate")
     private RedisTemplate<Object,Object> redisTemplate;
-
 
     public boolean setListToken(Integer stock, Integer goodsId) {
         try {
             for (int i = 0; i < stock; i++) {
                 String token=UUIDUtils.uuid();
                 redisTemplate.opsForList().leftPush("token:goodsId:" + goodsId, token);
-                redisTemplate.opsForSet().add("checkToken:goodsId:"+goodsId,token);
             }
         } catch (Exception e) {
             e.printStackTrace();

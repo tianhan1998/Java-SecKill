@@ -7,6 +7,7 @@ import cn.th.seckill.service.OrdersService;
 import cn.th.seckill.service.UserService;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import static cn.th.seckill.entity.Result.*;
 /**
  * @author tianh
  */
+@Slf4j
 @RestController
 public class OrdersController {
 
@@ -153,17 +155,21 @@ public class OrdersController {
     public JSONObject createOrder(@RequestBody OrderInfo order,HttpSession session) {
         JSONObject json = new JSONObject();
         try {
-            Boolean result=redisTemplate.opsForSet().isMember("checkToken:goodsId:"+order.getGoodsId(),order.getToken());
-            if(result!=null&&result) {
-                User user = (User) session.getAttribute("login_user");
-                order.setUserId(user.getId());
-                if (ordersService.insertOrder(order)) {
-                    json.put("result", successResult("下单成功，请尽快支付", order));
-                } else {
-                    json.put("result", failResult("商品已售完"));
+            User user= (User) session.getAttribute("login_user");
+            String token= (String) redisTemplate.opsForValue().get("checkToken:goodsId:"+order.getGoodsId()+":userId:"+user.getId());
+            if(token!=null) {
+                if(token.equals(order.getToken())) {
+                    order.setUserId(user.getId());
+                    if (ordersService.insertOrder(order)) {
+                        json.put("result", successResult("下单成功，请尽快支付", order));
+                    } else {
+                        json.put("result", failResult("商品已售完"));
+                    }
+                }else{
+                    json.put("result",failResult("token有误，请重新购买"));
                 }
             }else{
-                json.put("result",failResult("token有误，请进入商品界面重新购买"));
+                json.put("result",failResult("您还没有取得token，请重新购买"));
             }
         } catch (Exception e) {
             e.printStackTrace();

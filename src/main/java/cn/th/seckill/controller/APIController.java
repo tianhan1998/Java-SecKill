@@ -3,6 +3,7 @@ package cn.th.seckill.controller;
 import cn.th.seckill.entity.OrderInfo;
 import cn.th.seckill.entity.RSABean;
 import cn.th.seckill.entity.Result;
+import cn.th.seckill.entity.User;
 import cn.th.seckill.mapper.GoodsMapper;
 import cn.th.seckill.mapper.OrdersMapper;
 import cn.th.seckill.utils.RSAUtils;
@@ -48,14 +49,23 @@ public class APIController {
             return json;
     }
     @GetMapping("/getTokenThenBuy/{id}")
-    public JSONObject getTokenThenBuy(@PathVariable String id) {
+    public JSONObject getTokenThenBuy(@PathVariable String id,HttpSession session) {
         JSONObject json = new JSONObject();
         try {
             String token = (String) redisTemplate.opsForList().leftPop("token:goodsId:" + id);
-            if (token != null) {
-                json.put("result",successResult("取得token成功",token));
+            User user= (User) session.getAttribute("login_user");
+            if(token!=null) {
+                Boolean result=redisTemplate.opsForValue().setIfAbsent("checkToken:goodsId:"+id+":userId:"+user.getId(),token);
+                if (result) {
+                    json.put("result", successResult("取得token成功", token));
+                } else if (!result) {
+                    json.put("result", failResult("您已购买过此商品，请勿重复购买"));
+                    redisTemplate.opsForList().rightPush("token:goodsId:" + id, token);
+                } else {
+                    json.put("result", failResult("请稍后再试"));
+                }
             }else{
-                json.put("result",failResult("请稍后再试"));
+                json.put("result",failResult("商品已售完"));
             }
         } catch (Exception e) {
             e.printStackTrace();

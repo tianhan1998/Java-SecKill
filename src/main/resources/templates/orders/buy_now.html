@@ -140,7 +140,7 @@
                 }).then(response=>{
                     if(response.data.result.code===200){
                         swal(response.data.result.msg[0],{icon:"success"}).then(function () {
-                            window.location.href=context+"orderDetail/"+response.data.result.data.id;
+                            window.location.href=self.contextpath+"orders";
                         });
                     }else{
                         swal(response.data.result.msg[0],{icon:"error"});
