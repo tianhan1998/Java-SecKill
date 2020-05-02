@@ -17,13 +17,23 @@ mybatis:
     map-underscore-to-camel-case: true
   type-aliases-package: cn.th.seckill.entity
 
+
 server:
   servlet:
     context-path: /seckill
   port: 8080
+  http2:
+    enabled: true
+  undertow:
+    io-threads: 8
+    worker-threads: 64
+
+
   tomcat:
-    max-threads: 500
+    accept-count: 1000
+    max-threads: 800
     max-connections: 20000
+
 logging:
   level:
-    root: info
+    root: error

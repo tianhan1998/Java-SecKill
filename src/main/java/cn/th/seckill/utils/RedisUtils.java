@@ -1,6 +1,7 @@
 package cn.th.seckill.utils;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -10,7 +11,7 @@ public class RedisUtils{
     @Resource(name = "redisTemplate")
     private RedisTemplate<Object,Object> redisTemplate;
 
-    public boolean setListToken(Integer stock, Integer goodsId) {
+    public void setListToken(Integer stock, Integer goodsId) {
         try {
             for (int i = 0; i < stock; i++) {
                 String token=UUIDUtils.uuid();
@@ -18,8 +19,6 @@ public class RedisUtils{
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
-        return true;
     }
 }

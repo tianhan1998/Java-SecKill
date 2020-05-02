@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static cn.th.seckill.entity.Result.*;
 
@@ -155,21 +156,14 @@ public class OrdersController {
     public JSONObject createOrder(@RequestBody OrderInfo order,HttpSession session) {
         JSONObject json = new JSONObject();
         try {
-            User user= (User) session.getAttribute("login_user");
-            String token= (String) redisTemplate.opsForValue().get("checkToken:goodsId:"+order.getGoodsId()+":userId:"+user.getId());
-            if(token!=null) {
-                if(token.equals(order.getToken())) {
-                    order.setUserId(user.getId());
-                    if (ordersService.insertOrder(order)) {
-                        json.put("result", successResult("下单成功，请尽快支付", order));
-                    } else {
-                        json.put("result", failResult("商品已售完"));
-                    }
-                }else{
-                    json.put("result",failResult("token有误，请重新购买"));
-                }
+            User user = (User) session.getAttribute("login_user");
+            Boolean check=redisTemplate.opsForValue().setIfAbsent("limit:userId:"+user.getId(),order.getGoodsId().toString(),10, TimeUnit.SECONDS);
+            if(check!=null&&check) {
+                order.setUserId(user.getId());
+                ordersService.insertOrder(order, user);
+                json.put("result", successResult("正在下单中...请稍后", order));
             }else{
-                json.put("result",failResult("您还没有取得token，请重新购买"));
+                json.put("result",failResult("您点击太频繁了"));
             }
         } catch (Exception e) {
             e.printStackTrace();

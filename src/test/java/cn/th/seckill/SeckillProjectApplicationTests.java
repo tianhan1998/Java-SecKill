@@ -36,7 +36,7 @@ class SeckillProjectApplicationTests {
 
     @Test
     void setToken(){
-        utils.setListToken(10000,1);
+        utils.setListToken(20000,1);
     }
 
     @Test
@@ -66,7 +66,7 @@ class SeckillProjectApplicationTests {
     @Test
     void insertUser(){
         int i=10000;
-        BigInteger telephone=new BigInteger("10000010000");
+        BigInteger telephone=new BigInteger("10000010001");
         while(i>0){
             User user=new User();
             telephone=telephone.add(new BigInteger("1"));

@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+import java.util.concurrent.TimeUnit;
+
 import static cn.th.seckill.entity.Result.*;
 
 @Slf4j
@@ -28,6 +30,8 @@ public class APIController {
 
     @Resource(name = "redisTemplate")
     RedisTemplate<Object,Object> redisTemplate;
+    @Resource
+    RedisTemplate<String,Result<Object>> resultRedisTemplate;
 
     @GetMapping("/getPublicKey")
     public JSONObject getPublicKey(HttpSession session){
@@ -72,6 +76,12 @@ public class APIController {
             json.put("result", exceptionResult(e.getMessage()));
         }
         return json;
+    }
+    @GetMapping("/result/{id}")
+    public JSONObject getResult(@PathVariable String id,HttpSession session){
+        User user= (User) session.getAttribute("login_user");
+        Result<Object> result=resultRedisTemplate.opsForList().leftPop("result:goodsId:"+id+":userId:"+user.getId(),5, TimeUnit.SECONDS);
+        return new JSONObject(){{this.put("result",result);}};
     }
 
 }

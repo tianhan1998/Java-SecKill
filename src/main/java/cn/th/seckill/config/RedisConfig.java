@@ -2,6 +2,7 @@ package cn.th.seckill.config;
 
 import cn.th.seckill.entity.Goods;
 import cn.th.seckill.entity.OrderInfo;
+import cn.th.seckill.entity.Result;
 import cn.th.seckill.entity.SeckillGoods;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import org.springframework.context.annotation.Bean;
@@ -55,10 +56,18 @@ public class RedisConfig {
     }
     @Bean
     public RedisTemplate<Object,Object> redisTemplate(RedisConnectionFactory redisConnectionFactory){
-        RedisTemplate<Object, Object> template = new RedisTemplate();
+        RedisTemplate<Object, Object> template = new RedisTemplate<>();
         template.setDefaultSerializer(new StringRedisSerializer());
         template.setConnectionFactory(redisConnectionFactory);
         return template;
+    }
+    @Bean
+    public RedisTemplate<String, Result<Object>> resultRedisTemplate(RedisConnectionFactory redisConnectionFactory){
+        RedisTemplate<String,Result<Object>> redisTemplate=new RedisTemplate<>();
+        redisTemplate.setValueSerializer(new FastJsonRedisSerializer<>(Result.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        return redisTemplate;
     }
     @Bean
     @Primary

@@ -27,12 +27,12 @@ public class UserController {
         User logUser;
         try {
             if (!StringUtils.isEmpty(user.getPassword())&&!StringUtils.isEmpty(user.getPhone())) {
-//                String privateKey = (String) session.getAttribute("privateKey");
-//                if (StringUtils.isEmpty(privateKey)) {
-//                    json.put("result", failResult("获取公钥失败，请刷新页面"));
-//                } else {
-//                    String dePass = RSAUtils.decrypt(user.getPassword(), (String) session.getAttribute("privateKey"));
-//                    user.setPassword(dePass);
+                String privateKey = (String) session.getAttribute("privateKey");
+                if (StringUtils.isEmpty(privateKey)) {
+                    json.put("result", failResult("获取公钥失败，请刷新页面"));
+                } else {
+                    String dePass = RSAUtils.decrypt(user.getPassword(), (String) session.getAttribute("privateKey"));
+                    user.setPassword(dePass);
                     logUser = service.selectUserByPhoneAndPassword(user);
                     System.out.println(logUser);
                     if (logUser != null) {
@@ -42,7 +42,7 @@ public class UserController {
                     } else {
                         json.put("result", failResult("用户名或密码错误"));
                     }
-//                }
+                }
             } else {
                 json.put("result", failResult("用户名和密码不能为空"));
             }

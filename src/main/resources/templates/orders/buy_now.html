@@ -124,7 +124,7 @@
             });
         },
         methods:{
-            createOrder:function () {
+            createOrder: function () {
                 var self=this;
                 axios({
                     url:context+"/order",
@@ -138,10 +138,26 @@
                         'token':self.token,
                     }
                 }).then(response=>{
-                    if(response.data.result.code===200){
-                        swal(response.data.result.msg[0],{icon:"success"}).then(function () {
-                            window.location.href=self.contextpath+"orders";
-                        });
+                    if(response.data.result.code===200) {
+                        swal(response.data.result.msg[0]);
+                         $.ajax({
+                             url:context+"api/result/"+self.goodId,
+                             type:'GET',
+                             success:response=>{
+                                 if(response.result.code===200){
+                                     swal(response.result.msg[0],{icon:"success"}).then(function () {
+                                         window.location.href=context+"orders";
+                                     });
+                                 }else{
+                                     swal(response.result.msg[0],{icon:"error"}).then(function () {
+                                        window.location.reload();
+                                     });
+                                 }
+                             },
+                             error:response=>{
+                                 console.log(response);
+                             }
+                         })
                     }else{
                         swal(response.data.result.msg[0],{icon:"error"});
                     }
