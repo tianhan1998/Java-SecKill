@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: release
 
 rsa:
   # rsa密钥生成数量

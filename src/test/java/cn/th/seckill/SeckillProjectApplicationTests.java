@@ -44,23 +44,23 @@ class SeckillProjectApplicationTests {
 //        Queue insertOrder = new Queue("insert_order_queue",true);
 //        admin.declareQueue(insertOrder);
 //        TopicExchange order_topic_exchange=new TopicExchange("order_topic_exchange");
-        TopicExchange secGoods_topic_exchange=new TopicExchange("secGoods_topic_exchange");
-        admin.declareExchange(secGoods_topic_exchange);
+//        TopicExchange secGoods_topic_exchange=new TopicExchange("secGoods_topic_exchange");
+//        admin.declareExchange(secGoods_topic_exchange);
 //        admin.declareExchange(order_topic_exchange);
 //        Binding binding=BindingBuilder.bind(insertOrder).to(order_topic_exchange).with("order.insert");
 //        admin.declareBinding(binding);
-//        Queue insertOrder = new Queue("delete_order_queue",true);
+//        Queue deleteOrder = new Queue("delete_order_queue",true);
 //        admin.declareQueue(insertOrder);
-//        Binding binding=BindingBuilder.bind(insertOrder).to(order_topic_exchange).with("order.delete");
+//        Binding binding1=BindingBuilder.bind(insertOrder).to(order_topic_exchange).with("order.delete");
 //        admin.declareBinding(binding);
-        Queue inc_order_queue= new Queue("inc_order_queue",true);
-        Queue dec_order_queue= new Queue("dec_order_queue",true);
-        admin.declareQueue(inc_order_queue);
-        admin.declareQueue(dec_order_queue);
-        Binding binding=BindingBuilder.bind(inc_order_queue).to(secGoods_topic_exchange).with("secGood.inc");
-        Binding binding2=BindingBuilder.bind(dec_order_queue).to(secGoods_topic_exchange).with("secGood.dec");
-        admin.declareBinding(binding);
-        admin.declareBinding(binding2);
+//        Queue inc_order_queue= new Queue("inc_order_queue",true);
+//        Queue dec_order_queue= new Queue("dec_order_queue",true);
+//        admin.declareQueue(inc_order_queue);
+//        admin.declareQueue(dec_order_queue);
+//        Binding binding2=BindingBuilder.bind(inc_order_queue).to(secGoods_topic_exchange).with("secGood.inc");
+//        Binding binding3=BindingBuilder.bind(dec_order_queue).to(secGoods_topic_exchange).with("secGood.dec");
+//        admin.declareBinding(binding);
+//        admin.declareBinding(binding2);
     }
 
     @Test

@@ -11,6 +11,24 @@ spring:
       min-idle: 10
       max-active: 20
       filters: stat,wall,slf4j
+  redis:
+    password:
+    host: localhost
+
+
+  cache:
+    redis:
+      use-key-prefix: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password:
+    virtual-host: /seckill
+    listener:
+      direct:
+        default-requeue-rejected: false
+
 mybatis:
   mapper-locations: classpath:mappers/*.xml
   configuration:

@@ -18,6 +18,9 @@ target/
 *.iws
 *.iml
 *.ipr
+*.js linguist-language=java
+*.css linguist-language=java
+*.html linguist-language=java
 
 ### NetBeans ###
 /nbproject/private/
